@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kortex AI: геометрический нейро-узел в форме буквы K -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Глубокий тёмный фон -->
+    <path
+        android:fillColor="#171717"
+        android:pathData="M0,0h108v108H0z"/>
+
+    <!-- Тусклые синаптические связи к узлу-спутнику -->
+    <path
+        android:strokeColor="#3A3A3A"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M68,32 L76,54 M68,76 L76,54"/>
+
+    <!-- Основные рёбра буквы K -->
+    <path
+        android:strokeColor="#ECECEC"
+        android:strokeWidth="5"
+        android:strokeLineCap="round"
+        android:pathData="M42,32 L42,76 M42,54 L68,32 M42,54 L68,76"/>
+
+    <!-- Узлы-нейроны на концах штрихов -->
+    <path
+        android:fillColor="#ECECEC"
+        android:pathData="M37.5,32 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0 Z"/>
+    <path
+        android:fillColor="#ECECEC"
+        android:pathData="M37.5,76 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0 Z"/>
+    <path
+        android:fillColor="#ECECEC"
+        android:pathData="M63.5,32 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0 Z"/>
+    <path
+        android:fillColor="#ECECEC"
+        android:pathData="M63.5,76 a4.5,4.5 0 1,0 9,0 a4.5,4.5 0 1,0 -9,0 Z"/>
+
+    <!-- Узел-спутник -->
+    <path
+        android:fillColor="#8A8A8A"
+        android:pathData="M73,54 a3,3 0 1,0 6,0 a3,3 0 1,0 -6,0 Z"/>
+
+    <!-- Центральный хаб -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35.5,54 a6.5,6.5 0 1,0 13,0 a6.5,6.5 0 1,0 -13,0 Z"/>
+</vector>
