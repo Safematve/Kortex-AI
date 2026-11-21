@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="kortex_bg">#171717</color>
+    <color name="kortex_surface">#212121</color>
+    <color name="kortex_elevated">#2F2F2F</color>
+    <color name="kortex_stroke">#3A3A3A</color>
+    <color name="kortex_text">#ECECEC</color>
+</resources>
