@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#171717">
+<title>Kortex AI</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://js.puter.com/v2/"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root{
+  --bg:#171717; --surface:#212121; --elev:#2F2F2F; --stroke:#3A3A3A;
+  --text:#ECECEC; --muted:#9A9A9A; --dim:#6E6E6E; --link:#8AB4F8;
+  --ok:#34D399; --warn:#FBBF24; --bad:#F87171;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);overscroll-behavior:none;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:16px;line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+::selection{background:var(--stroke)}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-thumb{background:var(--elev);border-radius:3px}
+::-webkit-scrollbar-track{background:transparent}
+.hidden{display:none!important}
+:focus-visible{outline:2px solid var(--link);outline-offset:2px}
+.egg-logo{cursor:pointer;-webkit-user-select:none;user-select:none}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+#topbar{display:flex;align-items:center;gap:4px;padding:calc(6px + var(--safe-t)) 8px 6px;flex:0 0 auto}
+.icon-btn{width:40px;height:40px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  background:transparent;border:0;border-radius:10px;color:#B4B4B4}
+.icon-btn:hover{background:var(--elev);color:#fff}
+.icon-btn svg{width:22px;height:22px}
+#modelBadge{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:0;
+  color:var(--text);font-size:15px;font-weight:600;padding:9px 10px;border-radius:10px;min-width:0}
+#modelBadge:hover{background:var(--elev)}
+#modelBadgeText{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#modelBadge svg{width:14px;height:14px;opacity:.55;flex:0 0 auto}
+#speedTag{font-size:12px;color:var(--warn);flex:0 0 auto}
+#chatScroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+#messages{max-width:768px;margin:0 auto;padding:20px 16px 12px}
+.msg-user{display:flex;flex-direction:column;align-items:flex-end;margin:18px 0}
+.bubble{background:var(--elev);border-radius:20px;padding:10px 16px;max-width:85%;
+  white-space:pre-wrap;word-break:break-word}
+.msg-atts{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;margin-bottom:6px}
+.msg-ai{margin:22px 0}
+.ai-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.ai-avatar{width:24px;height:24px;border-radius:8px;background:var(--elev);border:1px solid var(--stroke);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:0 0 auto}
+.ai-name{font-size:13px;font-weight:600;color:#B4B4B4}
+.ai-model{font-size:11px;color:var(--muted);background:var(--surface);border:1px solid var(--elev);
+  border-radius:999px;padding:2px 8px}
+.ai-status{color:var(--muted);font-size:14px;margin-right:8px}
+.typing{display:inline-flex;gap:4px;vertical-align:middle}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:blink 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.2s}
+.typing i:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.msg-actions{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.msg-act{background:transparent;border:1px solid var(--stroke);color:#B4B4B4;border-radius:8px;
+  padding:5px 10px;font-size:12.5px}
+.msg-act:hover{background:var(--elev);color:#fff}
+.sys-note{display:table;margin:14px auto;background:var(--surface);border:1px solid var(--elev);
+  color:var(--muted);font-size:12.5px;border-radius:999px;padding:6px 14px;max-width:92%;text-align:center}
+.gen-wrap{border:1px solid var(--elev);border-radius:14px;overflow:hidden;background:#0F0F0F;max-width:520px}
+.gen-img{display:block;width:100%;height:auto}
+.gen-missing{padding:22px 16px;text-align:center;color:var(--muted);font-size:13px}
+.gen-prompt{margin-top:8px;font-size:12.5px;color:var(--muted)}
+.md{line-height:1.65;word-break:break-word}
+.md p{margin:.5em 0}
+.md h1,.md h2,.md h3,.md h4{margin:1em 0 .4em;line-height:1.3;font-weight:650}
+.md h1{font-size:1.3em}.md h2{font-size:1.18em}.md h3{font-size:1.06em}.md h4{font-size:1em}
+.md ul,.md ol{margin:.5em 0;padding-left:1.4em}
+.md li{margin:.25em 0}
+.md blockquote{margin:.6em 0;border-left:3px solid var(--stroke);padding-left:12px;color:#B4B4B4}
+.md hr{border:0;border-top:1px solid var(--elev);margin:16px 0}
+.md a{color:var(--link)}
+.md code{background:var(--elev);border-radius:6px;padding:2px 6px;font-size:.9em;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.md-table{overflow-x:auto;margin:.6em 0}
+.md table{border-collapse:collapse;font-size:.95em}
+.md th,.md td{border:1px solid var(--elev);padding:6px 10px;text-align:left}
+.md th{background:var(--surface)}
+.code-block{margin:12px 0;border:1px solid var(--elev);border-radius:12px;overflow:hidden;background:#0F0F0F}
+.code-head{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--surface);padding:6px 10px;font-size:12px;color:var(--muted)}
+.code-tools{display:flex;gap:6px}
+.code-btn{background:transparent;border:1px solid var(--stroke);color:#B4B4B4;border-radius:6px;
+  padding:3px 8px;font-size:12px}
+.code-btn:hover{background:var(--elev);color:#fff}
+.code-block pre{margin:0;padding:12px;overflow-x:auto}
+.code-block code,.code-block code.hljs{background:transparent;padding:0;font-size:13px;line-height:1.55;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.consilium-card{border:1px solid var(--elev);background:var(--surface);border-radius:14px;padding:12px 14px;margin:18px 0}
+.cc-title{font-size:13px;font-weight:600;margin-bottom:10px}
+.cc-chips{display:flex;flex-wrap:wrap;gap:8px}
+.cc-chip{font-size:12px;background:var(--bg);border:1px solid var(--elev);border-radius:999px;padding:5px 10px;color:#B4B4B4}
+.cc-chip em{font-style:normal;margin-left:6px}
+.cc-chip.run em{animation:blink 1.2s infinite}
+.cc-chip.ok em{color:var(--ok)}
+.cc-chip.fail em{color:var(--bad)}
+.cc-phase{margin-top:10px;font-size:12.5px;color:var(--muted)}
+#composer{flex:0 0 auto;padding:6px 12px calc(10px + var(--safe-b));background:var(--bg)}
+#attachRow,#pluginChips{max-width:768px;margin:0 auto 8px;display:flex;flex-wrap:wrap;gap:6px}
+.att-card{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--elev);
+  border-radius:12px;padding:6px 8px;max-width:230px}
+.att-thumb{width:38px;height:38px;border-radius:8px;object-fit:cover;flex:0 0 auto;background:var(--elev)}
+.att-ico{width:38px;height:38px;border-radius:8px;background:var(--elev);display:flex;align-items:center;
+  justify-content:center;font-size:18px;flex:0 0 auto}
+.att-meta{display:flex;flex-direction:column;min-width:0}
+.att-meta b{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.att-meta i{font-style:normal;font-size:11px;color:var(--dim)}
+.att-card button{background:transparent;border:0;color:var(--muted);font-size:14px;padding:0 2px;flex:0 0 auto}
+.att-chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--elev);
+  border-radius:10px;padding:5px 10px;font-size:12.5px;color:#B4B4B4}
+.plugin-chip{background:var(--elev);border:1px solid var(--stroke);color:var(--text);border-radius:999px;
+  padding:5px 12px;font-size:12.5px}
+#inputRow{max-width:768px;margin:0 auto;display:flex;align-items:flex-end;gap:4px;
+  background:var(--elev);border:1px solid transparent;border-radius:26px;padding:6px 8px}
+#inputRow:focus-within{border-color:var(--stroke)}
+#input{flex:1;background:transparent;border:0;outline:0;resize:none;color:var(--text);
+  font-family:inherit;font-size:16px;line-height:1.5;max-height:160px;padding:8px 4px;min-width:0}
+#input::placeholder{color:var(--dim)}
+#btnPlus,#btnMic{width:36px;height:36px}
+.send-btn{width:36px;height:36px;flex:0 0 auto;border:0;border-radius:50%;background:var(--text);
+  color:var(--bg);display:flex;align-items:center;justify-content:center}
+.send-btn:disabled{opacity:.35;cursor:default}
+.send-btn svg{width:20px;height:20px}
+#composerHint{max-width:768px;margin:8px auto 0;text-align:center;font-size:11px;color:var(--dim)}
+#backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:30}
+#sidebar{position:fixed;top:0;bottom:0;left:0;width:84vw;max-width:320px;z-index:40;background:var(--surface);
+  border-right:1px solid var(--elev);display:flex;flex-direction:column;
+  padding:calc(12px + var(--safe-t)) 12px calc(12px + var(--safe-b));
+  transform:translateX(-105%);transition:transform .28s cubic-bezier(.2,.8,.2,1)}
+#sidebar.open{transform:none}
+.side-head{display:flex;align-items:center;justify-content:space-between;padding:2px 2px 12px}
+.brand{display:flex;align-items:center;gap:10px;font-size:16px;font-weight:700}
+.brand-mark{width:28px;height:28px;border-radius:8px;background:var(--bg);border:1px solid var(--stroke);
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.side-new{width:100%;text-align:left;background:transparent;border:1px solid var(--stroke);border-radius:12px;
+  padding:10px 12px;font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px}
+.side-new:hover{background:var(--elev)}
+#chatSearch{width:100%;background:var(--bg);border:1px solid var(--elev);border-radius:10px;
+  padding:8px 12px;color:var(--text);font-size:14px;outline:0;margin-bottom:10px;font-family:inherit}
+#chatSearch:focus{border-color:var(--stroke)}
+#chatList{flex:1;overflow-y:auto;margin:0 -4px;padding:0 4px;min-height:60px}
+.chat-item{display:flex;align-items:center;gap:6px;padding:9px 10px;border-radius:10px;cursor:pointer}
+.chat-item:hover,.chat-item.active{background:var(--elev)}
+.ci-title{flex:1;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci-edit{flex:1;min-width:0;background:var(--bg);border:1px solid var(--stroke);border-radius:6px;
+  color:var(--text);font-size:14px;padding:3px 6px;outline:0;font-family:inherit}
+.ci-btn{width:26px;height:26px;flex:0 0 auto;background:transparent;border:0;border-radius:6px;
+  color:var(--muted);font-size:13px;opacity:.55}
+.chat-item:hover .ci-btn{opacity:1}
+.ci-btn:hover{background:var(--stroke);color:#fff}
+.ci-btn.armed{color:var(--bad);opacity:1}
+.ci-empty{color:var(--dim);font-size:13px;text-align:center;padding:16px 0}
+.side-sep{height:1px;background:var(--elev);margin:10px 0}
+.side-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:2px 2px 8px}
+.svc{width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;
+  background:transparent;border:0;color:#D9D9D9;font-size:14px;text-align:left}
+.svc:hover{background:var(--elev)}
+.svc-dot{width:8px;height:8px;border-radius:50%;background:var(--c,#8A8A8A);flex:0 0 auto}
+.side-settings{width:100%;display:flex;align-items:center;gap:10px;background:var(--elev);border:1px solid var(--stroke);
+  border-radius:12px;padding:11px 12px;color:var(--text);font-size:14px;font-weight:600;text-align:left}
+.side-settings:hover{background:var(--stroke)}
+.side-auth{width:100%;margin-top:8px;background:transparent;border:1px solid var(--stroke);border-radius:12px;
+  padding:9px 12px;color:var(--text);font-size:13px;text-align:left}
+.side-auth:hover{background:var(--elev)}
+.side-foot{font-size:11px;color:var(--dim);text-align:center;padding-top:10px}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--surface);
+  border-top:1px solid var(--elev);border-radius:20px 20px 0 0;padding:8px 12px calc(16px + var(--safe-b));
+  transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.8,.2,1);max-height:86vh;overflow-y:auto}
+.sheet.open{transform:none}
+.sheet-grip{width:36px;height:4px;border-radius:2px;background:var(--stroke);margin:6px auto 10px}
+.sheet-title{font-size:13px;color:var(--muted);padding:0 6px 8px}
+.sheet-item{width:100%;display:flex;align-items:center;gap:12px;padding:12px 8px;border-radius:12px;
+  background:transparent;border:0;color:var(--text);text-align:left}
+.sheet-item:hover{background:var(--elev)}
+.si-ico{font-size:20px;width:28px;text-align:center;flex:0 0 auto}
+.si-txt{flex:1;display:flex;flex-direction:column;min-width:0}
+.si-txt b{font-size:14.5px;font-weight:600}
+.si-txt i{font-style:normal;font-size:12px;color:var(--muted);margin-top:2px}
+.sheet-sep{height:1px;background:var(--elev);margin:6px 0}
+.switch{width:40px;height:24px;flex:0 0 auto;border-radius:999px;background:var(--stroke);position:relative;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;
+  background:#fff;transition:left .2s,background .2s}
+.switch.on{background:var(--text)}
+.switch.on::after{left:19px;background:var(--bg)}
+.modal{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-card{background:var(--surface);border:1px solid var(--elev);border-radius:18px;width:100%;
+  max-width:440px;max-height:82vh;overflow-y:auto;padding:16px}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:12px}
+.model-item{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:12px;
+  border-radius:12px;border:1px solid transparent;background:transparent;color:var(--text);text-align:left}
+.model-item:hover{background:var(--elev)}
+.model-item.selected{border-color:var(--stroke);background:var(--elev)}
+.mi-name{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mi-check{color:var(--ok)}
+.mi-cool{font-size:10.5px;color:var(--warn);border:1px solid var(--stroke);border-radius:999px;padding:1px 6px}
+.mi-desc{font-size:12px;color:var(--muted);line-height:1.4}
+.modal-close{width:100%;margin-top:10px;padding:10px;border-radius:10px;background:var(--elev);border:0;color:var(--text);font-size:14px}
+.confirm-text{font-size:14.5px;line-height:1.5;color:#D9D9D9;margin-bottom:14px}
+.confirm-btns{display:flex;gap:8px}
+.btn-primary{flex:1;padding:11px;border-radius:10px;background:var(--text);color:var(--bg);border:0;font-size:14px;font-weight:600}
+.btn-ghost{flex:1;padding:11px;border-radius:10px;background:var(--elev);color:var(--text);border:1px solid var(--stroke);font-size:14px}
+.seg{display:flex;background:var(--bg);border:1px solid var(--elev);border-radius:12px;padding:3px;gap:3px;margin-bottom:12px}
+.seg-btn{flex:1;padding:9px 6px;border-radius:9px;background:transparent;border:0;color:var(--muted);font-size:12.5px}
+.seg-btn.active{background:var(--elev);color:var(--text);font-weight:600}
+.dev-row{display:flex;align-items:center;gap:12px;padding:11px 4px;border-top:1px solid var(--elev)}
+.dev-row .si-txt b{font-size:14px}
+.diag{margin-top:12px;background:#0F0F0F;border:1px solid var(--elev);border-radius:10px;padding:10px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:#B4B4B4;
+  white-space:pre-wrap;word-break:break-word;max-height:200px;overflow-y:auto}
+.dev-actions{display:flex;gap:8px;margin-top:10px}
+#settingsOverlay{position:fixed;inset:0;z-index:75;background:var(--bg);display:flex;flex-direction:column}
+.set-head{display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-t)) 12px 10px;border-bottom:1px solid var(--elev)}
+.set-title{font-size:15.5px;font-weight:700;flex:1}
+.set-body{flex:1;overflow-y:auto;padding:14px 14px calc(24px + var(--safe-b));max-width:768px;margin:0 auto;width:100%}
+.set-section{background:var(--surface);border:1px solid var(--elev);border-radius:16px;padding:12px 14px;margin-bottom:14px}
+.set-h{font-size:13px;font-weight:700;margin-bottom:10px;color:#D9D9D9}
+.set-note{font-size:11.5px;color:var(--dim);line-height:1.45;margin-top:8px}
+.acc-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--elev);flex-wrap:wrap}
+.acc-row:first-child{border-top:0}
+.acc-dot{width:9px;height:9px;border-radius:50%;background:var(--stroke);flex:0 0 auto}
+.acc-dot.opened{background:var(--warn)}
+.acc-dot.linked{background:var(--ok)}
+.acc-dot.none{background:var(--stroke)}
+.acc-txt{flex:1;display:flex;flex-direction:column;min-width:120px}
+.acc-txt b{font-size:14px;font-weight:600}
+.acc-txt i{font-style:normal;font-size:11.5px;color:var(--muted);margin-top:2px}
+.acc-btns{display:flex;gap:6px;flex:0 0 auto}
+.acc-btn{background:var(--elev);border:1px solid var(--stroke);color:var(--text);border-radius:9px;padding:7px 11px;font-size:12.5px}
+.acc-btn:hover{background:var(--stroke)}
+.set-btns{display:flex;flex-wrap:wrap;gap:8px}
+.set-btn{background:var(--elev);border:1px solid var(--stroke);color:var(--text);border-radius:10px;padding:10px 12px;font-size:13px}
+.set-btn:hover{background:var(--stroke)}
+.set-btn.danger{color:var(--bad);border-color:#4A2A2A}
+.set-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--elev)}
+.set-row:first-of-type{border-top:0}
+.storage-info{font-size:12px;color:var(--muted);margin-bottom:10px}
+.about{font-size:12px;color:var(--dim);text-align:center;padding:4px 0 10px}
+#voiceOverlay{position:fixed;inset:0;z-index:85;background:var(--bg);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;padding:24px}
+.voice-close{position:absolute;top:calc(12px + var(--safe-t));right:12px}
+#sphereWrap{width:210px;height:210px;position:relative;display:flex;align-items:center;justify-content:center;--rms:0}
+#sphere{width:142px;height:142px;border-radius:50%;border:1px solid var(--stroke);
+  background:radial-gradient(circle at 32% 30%,#4A4A4A,#2F2F2F 45%,#171717 78%);
+  box-shadow:0 0 60px rgba(255,255,255,.08),inset 0 0 30px rgba(255,255,255,.06);
+  transform:scale(calc(1 + var(--rms)*.38));transition:transform .09s linear}
+.sphere-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.12);
+  opacity:.25;animation:ringPulse 2.4s ease-out infinite;animation-play-state:paused}
+.sphere-ring.r2{animation-delay:1.2s}
+@keyframes ringPulse{0%{transform:scale(.72);opacity:.9}100%{transform:scale(1.16);opacity:0}}
+#voiceOverlay[data-state="listening"] .sphere-ring,
+#voiceOverlay[data-state="speaking"] .sphere-ring,
+#voiceOverlay[data-state="thinking"] .sphere-ring{animation-play-state:running}
+#voiceOverlay[data-state="thinking"] .sphere-ring{animation-duration:1.2s}
+#voiceStatus{font-size:17px;font-weight:600}
+#voiceTranscript{min-height:52px;max-width:520px;text-align:center;color:#D9D9D9;font-size:16px;line-height:1.5}
+#voiceTranscript.interim{color:var(--muted)}
+#voiceTranscript.final{color:var(--text);font-weight:600}
+#voiceHint{font-size:12.5px;color:var(--dim);text-align:center}
+body.fps60 #sphere{transition:transform .016s linear;will-change:transform}
+body.fps60 .sphere-ring{animation-duration:1.6s;will-change:transform,opacity}
+body.fps60 .typing i{animation-duration:.8s}
+body.fps60 #sidebar,body.fps60 .sheet{transition-duration:.18s}
+body.fps60 .toast{animation-duration:.16s}
+#sandboxOverlay{position:fixed;inset:0;z-index:78;background:var(--bg);display:flex;flex-direction:column}
+.sb-head{display:flex;align-items:center;gap:8px;padding:calc(10px + var(--safe-t)) 12px 10px;
+  border-bottom:1px solid var(--elev);flex-wrap:wrap}
+.sb-title{font-size:14px;font-weight:600}
+.sb-tabs{display:flex;background:var(--surface);border-radius:10px;padding:3px}
+.sb-tab{padding:6px 12px;border-radius:8px;font-size:13px;color:var(--muted);background:transparent;border:0}
+.sb-tab.active{background:var(--elev);color:var(--text)}
+.sb-actions{margin-left:auto;display:flex;gap:6px;align-items:center}
+.sb-btn{background:var(--elev);border:1px solid var(--stroke);color:var(--text);border-radius:10px;padding:7px 12px;font-size:13px}
+.sb-btn:hover{background:var(--stroke)}
+#sbBody{flex:1;position:relative;overflow:hidden}
+#sbCode{position:absolute;inset:0;width:100%;height:100%;background:#0F0F0F;color:var(--text);border:0;outline:0;
+  resize:none;padding:14px;font-size:13px;line-height:1.55;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+#sbFrame{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+#sbBody[data-tab="code"] #sbFrame{display:none}
+#sbBody[data-tab="preview"] #sbCode{display:none}
+@media (min-width:900px){
+  #sbBody[data-tab] #sbCode{display:block;width:50%}
+  #sbBody[data-tab] #sbFrame{display:block;left:50%;width:50%}
+  .sb-tabs{display:none}
+}
+#welcome{text-align:center;padding:9vh 8px 24px}
+#welcomeLogo{width:76px;height:76px;margin:0 auto}
+#welcomeLogo svg{width:76px;height:76px;display:block}
+#welcome h1{font-size:26px;font-weight:700;margin:14px 0 6px}
+#welcome p{color:var(--muted);font-size:14.5px;margin:0 0 22px}
+.sugg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:560px;margin:0 auto}
+.sugg{background:var(--surface);border:1px solid var(--elev);border-radius:14px;padding:14px;
+  font-size:13.5px;color:#D9D9D9;text-align:left;line-height:1.4}
+.sugg:hover{background:var(--elev)}
+#toasts{position:fixed;bottom:calc(96px + var(--safe-b));left:50%;transform:translateX(-50%);z-index:95;
+  display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:max-content;max-width:90vw}
+.toast{background:var(--elev);border:1px solid var(--stroke);color:var(--text);padding:10px 16px;border-radius:12px;
+  font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.4);animation:fadeUp .25s;max-width:90vw;text-align:center}
+.toast.out{opacity:0;transform:translateY(6px);transition:.3s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (max-width:600px){
+  #messages{padding:16px 12px}
+  .bubble{max-width:92%}
+  .sugg-grid{grid-template-columns:1fr}
+  .att-card{max-width:47%}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <button class="icon-btn" id="btnMenu" aria-label="Меню">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <button id="modelBadge" aria-label="Выбор модели">
+      <span id="speedTag" class="hidden">⚡</span>
+      <span id="modelBadgeText">⚡ GPT-4o mini — мгновенно</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <button class="icon-btn" id="btnNewChat" aria-label="Новый чат">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </header>
+  <div id="chatScroll"><div id="messages"></div></div>
+  <footer id="composer">
+    <div id="attachRow" class="hidden"></div>
+    <div id="pluginChips" class="hidden"></div>
+    <div id="inputRow">
+      <button class="icon-btn" id="btnPlus" aria-label="Плагины и вложения">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <textarea id="input" rows="1" placeholder="Сообщение Kortex AI…"></textarea>
+      <button class="icon-btn" id="btnMic" aria-label="Голосовой ассистент">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      </button>
+      <button class="send-btn" id="btnSend" aria-label="Отправить" disabled>
+        <svg id="icoSend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        <svg id="icoStop" class="hidden" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div id="composerHint">Kortex AI v1.0.0 · Puter.js · ответы ИИ могут содержать ошибки</div>
+  </footer>
+</div>
+<div id="backdrop" class="hidden"></div>
+<aside id="sidebar" aria-label="Боковая панель">
+  <div class="side-head">
+    <div class="brand"><div class="brand-mark egg-logo" id="brandLogo">K</div><span>Kortex AI</span></div>
+    <button class="icon-btn" id="btnCloseSide" aria-label="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <button class="side-new" id="btnNewChatSide">＋ Новый чат</button>
+  <input id="chatSearch" type="search" placeholder="Поиск по чатам…" autocomplete="off">
+  <div id="chatList"></div>
+  <div class="side-sep"></div>
+  <div class="side-label">Быстрый переход</div>
+  <nav id="svcLinks">
+    <button class="svc" data-svc="gemini"><span class="svc-dot" style="--c:#4285F4"></span>Google Gemini</button>
+    <button class="svc" data-svc="chatgpt"><span class="svc-dot" style="--c:#10A37F"></span>ChatGPT</button>
+    <button class="svc" data-svc="claude"><span class="svc-dot" style="--c:#D97757"></span>Claude</button>
+    <button class="svc" data-svc="deepseek"><span class="svc-dot" style="--c:#4D6BFE"></span>DeepSeek</button>
+    <button class="svc" data-svc="qwen"><span class="svc-dot" style="--c:#615CED"></span>Qwen Chat</button>
+    <button class="svc" data-svc="kimi"><span class="svc-dot" style="--c:#8E8E93"></span>Kimi</button>
+    <button class="svc" data-url="https://google.com"><span class="svc-dot" style="--c:#EA4335"></span>Google</button>
+  </nav>
+  <div class="side-sep"></div>
+  <button class="side-settings" id="btnOpenSettings">⚙️ Настройки и Центр аккаунтов</button>
+  <button class="side-auth" id="btnAuth"><span id="authName">Puter · войти</span></button>
+  <div class="side-foot">Kortex AI v1.0.0 · история хранится локально</div>
+</aside>
+<div id="plusSheet" class="sheet" aria-label="Плагины">
+  <div class="sheet-grip"></div>
+  <div class="sheet-title">Плагины и инструменты</div>
+  <button class="sheet-item" id="plSearch">
+    <span class="si-ico">🔍</span>
+    <span class="si-txt"><b>Веб-поиск</b><i>DuckDuckGo + Википедия как свежий контекст</i></span>
+    <span class="switch" id="swSearch"></span>
+  </button>
+  <button class="sheet-item" id="plStudy">
+    <span class="si-ico">🎓</span>
+    <span class="si-txt"><b>Учёба / домашка</b><i>Репетитор: пошаговые объяснения</i></span>
+    <span class="switch" id="swStudy"></span>
+  </button>
+  <button class="sheet-item" id="plDev">
+    <span class="si-ico">👨‍💻</span>
+    <span class="si-txt"><b>Режим разработчика</b><i>Код-первых ответы + песочница превью</i></span>
+    <span class="switch" id="swDev"></span>
+  </button>
+  <div class="sheet-sep"></div>
+  <button class="sheet-item" id="plAttach">
+    <span class="si-ico">📎</span>
+    <span class="si-txt"><b>Прикрепить фото, видео, документ</b><i>Задачи по фото, PDF, код и текст</i></span>
+  </button>
+  <button class="sheet-item" id="plPhoto">
+    <span class="si-ico">🎨</span>
+    <span class="si-txt"><b>Генератор фото HD</b><i>Картинки и арты прямо в чат</i></span>
+  </button>
+  <button class="sheet-item" id="plSandbox">
+    <span class="si-ico">🧪</span>
+    <span class="si-txt"><b>Песочница HTML/JS</b><i>Редактор, предпросмотр, скачивание .html</i></span>
+  </button>
+</div>
+<div id="modelModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-title">Модель</div>
+    <div id="modelList"></div>
+    <button class="modal-close" id="btnModelClose">Закрыть</button>
+  </div>
+</div>
+<div id="settingsOverlay" class="hidden">
+  <div class="set-head">
+    <div class="set-title">⚙️ Настройки и Центр аккаунтов</div>
+    <button class="icon-btn" id="btnSettingsClose" aria-label="Закрыть настройки">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="set-body">
+    <div class="set-section">
+      <div class="set-h">Puter Cloud — питание ИИ</div>
+      <div class="acc-row">
+        <span class="acc-dot none" id="accPuterDot" style="--c:#10A37F"></span>
+        <span class="acc-txt"><b>Puter Cloud</b><i id="accPuterStatus">Проверяю…</i></span>
+      </div>
+      <div class="set-btns">
+        <button class="set-btn" id="btnPuterGuest">⚡ Гостевой вход</button>
+        <button class="set-btn" id="btnPuterSignIn">Войти в аккаунт</button>
+        <button class="set-btn" id="btnPuterSignOut">Выйти</button>
+      </div>
+      <div class="set-note">Гостевой вход создаёт временный аккаунт автоматически — чат работает сразу, без окна авторизации. Полный аккаунт сохраняет квоты и историю Puter.</div>
+    </div>
+    <div class="set-section">
+      <div class="set-h">Центр аккаунтов · личные сервисы</div>
+      <div id="accList"></div>
+      <div class="set-note">Вход выполняется на официальном сайте внутри приложения (кнопка «← Kortex AI» вернёт обратно). Приложение не читает чужие cookies, поэтому статус «Подключён» подтверждается кнопкой «Готово» и хранится локально.</div>
+    </div>
+    <div class="set-section">
+      <div class="set-h">Голосовой ассистент</div>
+      <div class="set-row">
+        <span class="si-txt"><b>Слушать после ответа</b><i>Непрерывный диалог без кнопки</i></span>
+        <span class="switch" id="swAutoListen"></span>
+      </div>
+      <div class="set-row">
+        <span class="si-txt"><b>Озвучивать ответы</b><i>Русский голос TTS устройства</i></span>
+        <span class="switch" id="swTts"></span>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-h">История и память</div>
+      <div class="storage-info" id="storageInfo">—</div>
+      <div class="set-btns">
+        <button class="set-btn" id="btnExportHistory">⬇ Экспорт истории (.json)</button>
+        <button class="set-btn" id="btnClearMedia">🧹 Очистить медиа-кэш</button>
+        <button class="set-btn danger" id="btnClearHistory">🗑 Очистить историю</button>
+      </div>
+    </div>
+    <div class="set-section">
+      <div class="set-h">Сброс</div>
+      <div class="set-btns">
+        <button class="set-btn" id="btnResetSettings">↺ Сбросить настройки</button>
+      </div>
+      <div class="set-note">Модель по умолчанию — ⚡ GPT-4o mini (ответ 1–2 секунды). Тяжёлые задачи — «⚡ Совместные модели».</div>
+    </div>
+    <div class="about" id="aboutVer">Kortex AI v1.0.0</div>
+  </div>
+</div>
+<div id="devModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-title">🛠 Developer Turbo Menu</div>
+    <div class="seg">
+      <button class="seg-btn" id="spdNormal">Обычный</button>
+      <button class="seg-btn" id="spdTurbo">Турбо-стрим</button>
+      <button class="seg-btn" id="spdInstant">Мгновенный ответ</button>
+    </div>
+    <div class="dev-row">
+      <span class="si-txt"><b>Усиленные анимации 60 FPS</b><i>rAF-стрим, плавная сфера, быстрые переходы</i></span>
+      <span class="switch" id="swFps60"></span>
+    </div>
+    <div class="dev-row">
+      <span class="si-txt"><b>Turbo Fallback · авто-обход квот</b><i>Лимит модели → мгновенный переход и карантин 5 мин</i></span>
+      <span class="switch" id="swTurboFb"></span>
+    </div>
+    <div class="dev-actions">
+      <button class="set-btn" id="btnClearCooldown">Сбросить карантин</button>
+      <button class="set-btn" id="btnDevDiag">Обновить диагностику</button>
+    </div>
+    <div class="diag" id="devDiag">—</div>
+    <button class="modal-close" id="btnDevClose">Закрыть</button>
+  </div>
+</div>
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="confirm-text" id="confirmText">Подтвердите действие</div>
+    <div class="confirm-btns">
+      <button class="btn-ghost" id="confirmNo">Отмена</button>
+      <button class="btn-primary" id="confirmYes">Да</button>
+    </div>
+  </div>
+</div>
+<div id="voiceOverlay" class="hidden" data-state="idle">
+  <button class="icon-btn voice-close" id="btnVoiceClose" aria-label="Закрыть ассистента">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <div id="sphereWrap">
+    <div class="sphere-ring r1"></div>
+    <div class="sphere-ring r2"></div>
+    <div id="sphere"></div>
+  </div>
+  <div id="voiceStatus">Готовлюсь…</div>
+  <div id="voiceTranscript"></div>
+  <div id="voiceHint">Говорите по-русски — текст появится здесь, ответ прозвучит голосом. Тап по сфере — пауза.</div>
+</div>
+<div id="sandboxOverlay" class="hidden">
+  <div class="sb-head">
+    <div class="sb-title">🧪 Песочница</div>
+    <div class="sb-tabs">
+      <button class="sb-tab active" id="sbTabCode">Код</button>
+      <button class="sb-tab" id="sbTabPreview">Превью</button>
+    </div>
+    <div class="sb-actions">
+      <button class="sb-btn" id="btnSbRun">▶ Запуск</button>
+      <button class="sb-btn" id="btnSbDownload">⬇ .html</button>
+      <button class="icon-btn" id="btnSbClose" aria-label="Закрыть песочницу">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div id="sbBody" data-tab="code">
+    <textarea id="sbCode" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    <iframe id="sbFrame" title="Предпросмотр" sandbox="allow-scripts allow-modals allow-forms allow-popups"></iframe>
+  </div>
+</div>
+<input type="file" id="fileInput" accept="image/*,video/*,.pdf,.txt,.py,.js,.html" multiple hidden>
+<div id="toasts"></div>
+<script>
+'use strict';
+(function(){
+/* ======================================================================
+   Kortex AI v1.0.0 — интерфейс
+   ====================================================================== */
+var VER='1.0.0';
+var LS_CHATS='kortex.chats.v1', LS_SET='kortex.settings.v2', LS_COOL='kortex.cooldown.v1', LS_PEND='kortex.pendingLink.v1';
+
+var MODELS=[
+  {id:'gpt-4o-mini',kind:'chat',name:'⚡ GPT-4o mini — мгновенно',badge:'4o mini',
+   desc:'Самая быстрая: ответ за 1–2 секунды на обычные вопросы',
+   aliases:['gpt-4o-mini','openai/gpt-4o-mini','gpt-4.1-mini','openai/gpt-4.1-mini']},
+  {id:'consilium',kind:'multi',name:'⚡ Совместные модели',badge:'Совместные',
+   desc:'Для сложного кода, больших проектов и глубокого анализа',aliases:[]},
+  {id:'deepseek-reasoner',kind:'chat',name:'DeepSeek R1',badge:'R1',
+   desc:'Лучшая для списывания на уроках, математики, физики и точных задач',
+   aliases:['deepseek-reasoner','deepseek/deepseek-reasoner','deepseek-r1','deepseek/deepseek-r1','deepseek-r1-0528','deepseek/deepseek-r1-0528']},
+  {id:'claude-sonnet-4',kind:'chat',name:'Claude Sonnet 4',badge:'Sonnet 4',
+   desc:'Лучшая для программирования, сайтов и сложных скриптов',
+   aliases:['claude-sonnet-4','anthropic/claude-sonnet-4','anthropic/claude-sonnet-4-20250514','claude-sonnet-4-0']},
+  {id:'gpt-4o',kind:'chat',name:'GPT-4o',badge:'GPT-4o',
+   desc:'Универсальный помощник для любых вопросов и текстов',
+   aliases:['gpt-4o','openai/gpt-4o']},
+  {id:'qwen-max',kind:'chat',name:'Qwen Max',badge:'Qwen Max',
+   desc:'Мощная генерация кода и работа с документами',
+   aliases:['qwen-max','qwen/qwen-max','qwen-max-latest','qwen/qwen-max-latest']},
+  {id:'deepseek-chat',kind:'chat',name:'DeepSeek Chat',badge:'DeepSeek',
+   desc:'Быстрая и точная: разговоры, код, переводы',
+   aliases:['deepseek-chat','deepseek/deepseek-chat']},
+  {id:'image-hd',kind:'image',name:'🎨 Генератор фото HD',badge:'Фото HD',
+   desc:'Создание картинок и артов в высоком качестве',aliases:[]}
+];
+var CONSILIUM=['claude-sonnet-4','gpt-4o','deepseek-chat','qwen-max'];
+var FAST_CHAIN=['gpt-4o-mini','deepseek-chat','gpt-4o','qwen-max','claude-sonnet-4'];
+var SYNTH=['gpt-4o-mini','gpt-4o','claude-sonnet-4'];
+var VISION={'gpt-4o':true,'gpt-4o-mini':true,'claude-sonnet-4':true};
+var META={}, AVAIL=null;
+MODELS.forEach(function(m){META[m.id]=m;});
+var PL_LABEL={search:'🔍 Поиск',study:'🎓 Учёба',dev:'👨‍💻 Dev'};
+var SERVICES=[
+  {id:'gemini',name:'Google Gemini',url:'https://gemini.google.com',color:'#4285F4'},
+  {id:'chatgpt',name:'ChatGPT',url:'https://chatgpt.com',color:'#10A37F'},
+  {id:'claude',name:'Claude',url:'https://claude.ai',color:'#D97757'},
+  {id:'deepseek',name:'DeepSeek',url:'https://chat.deepseek.com',color:'#4D6BFE'},
+  {id:'qwen',name:'Qwen Chat',url:'https://chat.qwen.ai',color:'#615CED'},
+  {id:'kimi',name:'Kimi',url:'https://kimi.moonshot.cn',color:'#8E8E93'}
+];
+var SB_DEFAULT=[
+ '<!DOCTYPE html>','<html lang="ru">','<head>','<meta charset="utf-8">',
+ '<meta name="viewport" content="width=device-width,initial-scale=1">','<style>',
+ '  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#171717;color:#ECECEC;font-family:system-ui,sans-serif}',
+ '  .card{background:#212121;border:1px solid #2F2F2F;border-radius:16px;padding:28px;text-align:center}',
+ '  button{margin-top:14px;background:#ECECEC;color:#171717;border:0;border-radius:10px;padding:10px 18px;font-size:15px;cursor:pointer}',
+ '</style>','</head>','<body>','  <div class="card">','    <h2>🧪 Песочница Kortex</h2>',
+ '    <p id="n">Нажми кнопку</p>',
+ '    <button onclick="window.c=(window.c||0)+1;document.getElementById(&quot;n&quot;).textContent=&quot;Работает! &quot;+window.c">Клик</button>',
+ '  </div>','</body>','</html>'
+].join('\n');
+
+/* ---------------------------- состояние ---------------------------- */
+var settings={
+  model:'gpt-4o-mini',
+  plugins:{search:false,study:false,dev:false},
+  speed:'turbo',
+  dev:{unlocked:false,fps60:false,turboFallback:true},
+  voice:{autoListen:true,tts:true},
+  accounts:{}
+};
+var chats=[], currentId=null, generating=false, abortCtrl=null;
+var attachments=[], CODE_STORE={}, IMG_STORE={}, codeSeq=0;
+var voice={active:false,paused:false,state:'idle',rec:null};
+var COOL={}, saveTimer=null, puterWait=null, authPromise=null, guest=false;
+var egg={count:0,last:0};
+var rafId=null, rmsTarget=0, rmsCur=0, lastFrame=0;
+
+/* ---------------------------- утилиты ---------------------------- */
+function $(s){return document.querySelector(s);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function native(){return window.KortexNative||null;}
+function fmtSize(n){return n>1048576?(n/1048576).toFixed(1)+' МБ':n>1024?Math.round(n/1024)+' КБ':n+' Б';}
+function clamp(v,a,b){return v<a?a:v>b?b:v;}
+function buzz(ms){
+  try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}
+  var n=native();if(n&&n.vibrate){try{n.vibrate(ms);}catch(e){}}
+}
+function toast(t){
+  var box=$('#toasts'), d=document.createElement('div');
+  d.className='toast'; d.textContent=t; box.appendChild(d);
+  while(box.children.length>3)box.removeChild(box.firstChild);
+  setTimeout(function(){d.classList.add('out');setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},350);},2600);
+}
+function fetchJson(url,ms){
+  var c=new AbortController(), t=setTimeout(function(){c.abort();},ms||8000);
+  function clean(){clearTimeout(t);}
+  return fetch(url,{signal:c.signal}).then(function(r){clean();return r.json();},function(e){clean();throw e;});
+}
+function copyText(t,btn){
+  function ok(){if(btn){var old=btn.textContent;btn.textContent='✓ Скопировано';setTimeout(function(){btn.textContent=old;},1300);}}
+  function fb(){
+    var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');ok();}catch(e){toast('Не удалось скопировать');}
+    document.body.removeChild(ta);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb();
+}
+var confirmCb=null;
+function askConfirm(text,cb){
+  confirmCb=cb;$('#confirmText').textContent=text;$('#confirmModal').classList.remove('hidden');
+}
+
+/* ------------------------- IndexedDB (медиа) ------------------------- */
+var idb=null, MEM={};
+function openIDB(){
+  return new Promise(function(res){
+    if(idb)return res(idb);
+    try{
+      var rq=indexedDB.open('kortex-media',1);
+      rq.onupgradeneeded=function(){var db=rq.result;if(!db.objectStoreNames.contains('media'))db.createObjectStore('media');};
+      rq.onsuccess=function(){idb=rq.result;res(idb);};
+      rq.onerror=function(){res(null);};
+    }catch(e){res(null);}
+  });
+}
+function idbPut(k,v){
+  return openIDB().then(function(db){
+    if(!db){MEM[k]=v;return true;}
+    return new Promise(function(res){
+      try{
+        var tx=db.transaction('media','readwrite');
+        tx.objectStore('media').put(v,k);
+        tx.oncomplete=function(){res(true);};
+        tx.onerror=function(){MEM[k]=v;res(true);};
+      }catch(e){MEM[k]=v;res(true);}
+    });
+  });
+}
+function idbGet(k){
+  if(MEM[k])return Promise.resolve(MEM[k]);
+  return openIDB().then(function(db){
+    if(!db)return null;
+    return new Promise(function(res){
+      try{
+        var rq=db.transaction('media','readonly').objectStore('media').get(k);
+        rq.onsuccess=function(){res(rq.result||null);};
+        rq.onerror=function(){res(null);};
+      }catch(e){res(null);}
+    });
+  });
+}
+function idbClear(){
+  MEM={};IMG_STORE={};
+  return openIDB().then(function(db){
+    if(!db)return true;
+    return new Promise(function(res){
+      try{
+        var tx=db.transaction('media','readwrite');
+        tx.objectStore('media').clear();
+        tx.oncomplete=function(){res(true);};
+        tx.onerror=function(){res(false);};
+      }catch(e){res(false);}
+    });
+  });
+}
+
+/* ---------------------------- хранилище ---------------------------- */
+function newChatObj(){return {id:uid(),title:'Новый чат',createdAt:Date.now(),updatedAt:Date.now(),messages:[]};}
+function loadAll(){
+  try{
+    var s=JSON.parse(localStorage.getItem(LS_SET)||'null');
+    if(s){
+      if(s.model&&META[s.model])settings.model=s.model;
+      if(s.plugins)settings.plugins={search:!!s.plugins.search,study:!!s.plugins.study,dev:!!s.plugins.dev};
+      if(s.speed)settings.speed=s.speed;
+      if(s.dev)settings.dev={unlocked:!!s.dev.unlocked,fps60:!!s.dev.fps60,turboFallback:s.dev.turboFallback!==false};
+      if(s.voice)settings.voice={autoListen:s.voice.autoListen!==false,tts:s.voice.tts!==false};
+      if(s.accounts)settings.accounts=s.accounts;
+    }
+  }catch(e){}
+  try{var c=JSON.parse(localStorage.getItem(LS_CHATS)||'null');if(c&&c.length)chats=c;}catch(e){}
+  try{var k=JSON.parse(localStorage.getItem(LS_COOL)||'null');if(k)COOL=k;}catch(e){}
+  if(!chats.length)chats.push(newChatObj());
+  currentId=sortedChats()[0].id;
+}
+function sortedChats(){return chats.slice().sort(function(a,b){return b.updatedAt-a.updatedAt;});}
+function persistNow(){
+  try{localStorage.setItem(LS_CHATS,JSON.stringify(chats));return true;}
+  catch(e){
+    try{
+      var slim=chats.map(function(c){
+        return {id:c.id,title:c.title,createdAt:c.createdAt,updatedAt:c.updatedAt,
+          messages:c.messages.map(function(m){
+            var o={id:m.id,role:m.role,content:m.content,model:m.model,ts:m.ts};
+            if(m.atts)o.atts=m.atts;
+            if(m.role==='image'){o.prompt=m.prompt;o.key=m.key;}
+            return o;
+          })};
+      });
+      localStorage.setItem(LS_CHATS,JSON.stringify(slim));
+      toast('История сжата: превью картинок убраны из памяти');
+      return true;
+    }catch(e2){toast('Память переполнена — очистите историю в настройках');return false;}
+  }
+}
+function saveChats(){clearTimeout(saveTimer);saveTimer=setTimeout(persistNow,300);}
+function saveSettings(){try{localStorage.setItem(LS_SET,JSON.stringify(settings));}catch(e){}}
+function saveCool(){try{localStorage.setItem(LS_COOL,JSON.stringify(COOL));}catch(e){}}
+function getChat(){for(var i=0;i<chats.length;i++)if(chats[i].id===currentId)return chats[i];return null;}
+function markCool(id,ms){COOL[id]=Date.now()+(ms||300000);saveCool();}
+function isCooled(id){return COOL[id]&&COOL[id]>Date.now();}
+
+/* ------------------------ markdown + подсветка ------------------------ */
+function highlight(code,lang){
+  if(window.hljs){
+    try{
+      if(lang&&hljs.getLanguage(lang))return hljs.highlight(code,{language:lang,ignoreIllegals:true}).value;
+      return hljs.highlightAuto(code).value;
+    }catch(e){}
+  }
+  return esc(code);
+}
+function codeBlockHtml(code,lang,hl){
+  var id='cb'+(++codeSeq);CODE_STORE[id]=code;
+  var l=(lang||'').toLowerCase();
+  var isHtml=/^(html|htm|xml|svg)$/.test(l)||/<(!doctype|html|body|div|script|style)[\s>]/i.test(code);
+  return '<div class="code-block"><div class="code-head"><span>'+esc(l||'code')+'</span><span class="code-tools">'+
+    '<button class="code-btn" data-act="copy" data-code="'+id+'">Копировать</button>'+
+    (isHtml?'<button class="code-btn" data-act="preview" data-code="'+id+'">▶ Превью</button>':'')+
+    '</span></div><pre><code class="hljs">'+(hl?highlight(code,l):esc(code))+'</code></pre></div>';
+}
+function inlineMd(s){
+  var codes=[];
+  s=s.replace(/`([^`\n]+)`/g,function(_,c){codes.push(c);return '\u0000'+(codes.length-1)+'\u0000';});
+  s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+  s=s.replace(/(^|[\s(])\*([^*\n]+)\*/g,'$1<i>$2</i>');
+  s=s.replace(/(^|[\s(])_([^_\n]+)_/g,'$1<i>$2</i>');
+  s=s.replace(/~~([^~]+)~~/g,'<s>$1</s>');
+  s=s.replace(/\u0000(\d+)\u0000/g,function(_,i){return '<code>'+esc(codes[+i])+'</code>';});
+  return s;
+}
+function renderMarkdown(src,hl){
+  var lines=String(src).replace(/\r\n?/g,'\n').split('\n'),out='',i=0;
+  function isSep(l){return /^\s*\|?\s*:?-{3,}[\s:|-]*$/.test(l)&&l.indexOf('-')>=0;}
+  function cells(l){return l.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(function(c){return c.trim();});}
+  while(i<lines.length){
+    var line=lines[i];
+    var f=line.match(/^\s*```(\S*)\s*$/);
+    if(f){
+      var buf=[];i++;
+      while(i<lines.length&&!/^\s*```\s*$/.test(lines[i])){buf.push(lines[i]);i++;}
+      i++;out+=codeBlockHtml(buf.join('\n'),f[1],hl);continue;
+    }
+    if(/^\s*$/.test(line)){i++;continue;}
+    var h=line.match(/^(#{1,6})\s+(.*)$/);
+    if(h){var n=Math.min(h[1].length,4);out+='<h'+n+'>'+inlineMd(esc(h[2]))+'</h'+n+'>';i++;continue;}
+    if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)){out+='<hr>';i++;continue;}
+    if(/^\s*>\s?/.test(line)){
+      var q=[];while(i<lines.length&&/^\s*>\s?/.test(lines[i])){q.push(lines[i].replace(/^\s*>\s?/,''));i++;}
+      out+='<blockquote>'+q.map(function(l){return inlineMd(esc(l));}).join('<br>')+'</blockquote>';continue;
+    }
+    if(/^\s*[-*+]\s+/.test(line)){
+      var ul=[];while(i<lines.length&&/^\s*[-*+]\s+/.test(lines[i])){ul.push(lines[i].replace(/^\s*[-*+]\s+/,''));i++;}
+      out+='<ul>'+ul.map(function(l){return '<li>'+inlineMd(esc(l))+'</li>';}).join('')+'</ul>';continue;
+    }
+    if(/^\s*\d+[.)]\s+/.test(line)){
+      var ol=[];while(i<lines.length&&/^\s*\d+[.)]\s+/.test(lines[i])){ol.push(lines[i].replace(/^\s*\d+[.)]\s+/,''));i++;}
+      out+='<ol>'+ol.map(function(l){return '<li>'+inlineMd(esc(l))+'</li>';}).join('')+'</ol>';continue;
+    }
+    if(line.indexOf('|')>=0&&i+1<lines.length&&isSep(lines[i+1])){
+      var head=cells(line);i+=2;var rows=[];
+      while(i<lines.length&&lines[i].indexOf('|')>=0&&!/^\s*$/.test(lines[i])){rows.push(cells(lines[i]));i++;}
+      out+='<div class="md-table"><table><thead><tr>'+head.map(function(c){return '<th>'+inlineMd(esc(c))+'</th>';}).join('')+
+        '</tr></thead><tbody>'+rows.map(function(r){return '<tr>'+r.map(function(c){return '<td>'+inlineMd(esc(c))+'</td>';}).join('')+'</tr>';}).join('')+
+        '</tbody></table></div>';continue;
+    }
+    var p=[line];i++;
+    while(i<lines.length&&!/^\s*$/.test(lines[i])&&!/^\s*(#{1,6}\s|```|>|[-*+]\s|\d+[.)]\s)/.test(lines[i])&&
+      !(lines[i].indexOf('|')>=0&&i+1<lines.length&&isSep(lines[i+1]))){p.push(lines[i]);i++;}
+    out+='<p>'+p.map(function(l){return inlineMd(esc(l));}).join('<br>')+'</p>';
+  }
+  return out;
+}
+
+/* ---------------------------- рендер чата ---------------------------- */
+var msgsEl=$('#messages'), scrollEl=$('#chatScroll');
+function nearBottom(){return scrollEl.scrollHeight-scrollEl.scrollTop-scrollEl.clientHeight<160;}
+function scrollBottom(force){if(force||nearBottom())scrollEl.scrollTop=scrollEl.scrollHeight;}
+var LOGO_SVG='<svg viewBox="0 0 108 108" fill="none" aria-hidden="true">'+
+  '<rect width="108" height="108" rx="24" fill="#212121"/>'+
+  '<path d="M68 32L76 54M68 76L76 54" stroke="#3A3A3A" stroke-width="3" stroke-linecap="round"/>'+
+  '<path d="M42 32V76M42 54L68 32M42 54L68 76" stroke="#ECECEC" stroke-width="5" stroke-linecap="round"/>'+
+  '<circle cx="42" cy="32" r="4.5" fill="#ECECEC"/><circle cx="42" cy="76" r="4.5" fill="#ECECEC"/>'+
+  '<circle cx="68" cy="32" r="4.5" fill="#ECECEC"/><circle cx="68" cy="76" r="4.5" fill="#ECECEC"/>'+
+  '<circle cx="76" cy="54" r="3" fill="#8A8A8A"/><circle cx="42" cy="54" r="6.5" fill="#fff"/></svg>';
+var WELCOME='<div id="welcome"><div id="welcomeLogo" class="egg-logo">'+LOGO_SVG+'</div>'+
+  '<h1>Kortex AI</h1><p>Быстрые ответы, совместные модели, фото и голос.</p><div class="sugg-grid">'+
+  '<button class="sugg" data-q="Привет! Что ты умеешь?">⚡ Привет! Что ты умеешь?</button>'+
+  '<button class="sugg" data-q="Реши уравнение 2x² − 5x − 3 = 0 пошагово">🎓 Уравнение 2x² − 5x − 3 = 0</button>'+
+  '<button class="sugg" data-q="Сделай красивый тёмный лендинг в одном HTML-файле">🧪 Лендинг в одном файле</button>'+
+  '<button class="sugg" data-img="Неоновый город будущего ночью, дождь, киберпанк, высокая детализация">🎨 Фото: неоновый город</button>'+
+  '</div></div>';
+function showWelcome(){msgsEl.innerHTML=WELCOME;}
+function appendUser(msg){
+  var d=document.createElement('div');d.className='msg msg-user';
+  var atts='';
+  if(msg.atts&&msg.atts.length){
+    atts='<div class="msg-atts">'+msg.atts.map(function(a){
+      var ico=a.kind==='image'?'🖼 ':a.kind==='video'?'🎬 ':'📄 ';
+      return '<span class="att-chip static">'+ico+esc(a.name)+'</span>';
+    }).join('')+'</div>';
+  }
+  d.innerHTML=atts+'<div class="bubble">'+esc(msg.content).replace(/\n/g,'<br>')+'</div>';
+  msgsEl.appendChild(d);scrollBottom(true);
+}
+function createAi(label,tag){
+  var d=document.createElement('div');d.className='msg msg-ai';
+  d.innerHTML='<div class="ai-head"><span class="ai-avatar egg-logo">K</span><span class="ai-name">Kortex AI</span>'+
+    '<span class="ai-model">'+esc(tag||'')+'</span></div>'+
+    '<div class="msg-body md"><span class="ai-status">'+esc(label||'Думаю…')+'</span>'+
+    '<span class="typing"><i></i><i></i><i></i></span></div>';
+  msgsEl.appendChild(d);scrollBottom(true);
+  return {
+    node:d,_partial:'',done:false,
+    body:d.querySelector('.msg-body'),tag:d.querySelector('.ai-model'),
+    setLabel:function(t){var s=this.body.querySelector('.ai-status');if(s)s.textContent=t;},
+    render:function(text,hl){if(this.done)return;this.body.innerHTML=renderMarkdown(text,hl);scrollBottom();},
+    finalize:function(msg){
+      this.done=true;this.tag.textContent=(META[msg.model]&&META[msg.model].badge)||msg.model||'';
+      d._raw=msg.content;
+      this.body.innerHTML=renderMarkdown(msg.content,true)+
+        '<div class="msg-actions"><button class="msg-act" data-act="copy-msg">⧉ Копировать</button>'+
+        '<button class="msg-act" data-act="speak-msg">🔊 Озвучить</button></div>';
+      scrollBottom();
+    }
+  };
+}
+function addSysNote(t){
+  var d=document.createElement('div');d.className='sys-note';d.textContent=t;
+  msgsEl.appendChild(d);scrollBottom();
+}
+function imageMessage(msg,liveSrc){
+  var d=document.createElement('div');d.className='msg msg-ai';
+  d.innerHTML='<div class="ai-head"><span class="ai-avatar egg-logo">K</span><span class="ai-name">Kortex AI</span>'+
+    '<span class="ai-model">Фото HD</span></div><div class="msg-body">'+
+    '<div class="gen-wrap"><img class="gen-img" alt="'+esc(msg.prompt||'Изображение')+'" src="'+esc(liveSrc||msg.thumb||'')+'"></div>'+
+    '<div class="gen-prompt">'+esc(msg.prompt||'')+'</div>'+
+    '<div class="msg-actions"><button class="msg-act" data-act="save-img">⬇ Скачать фото</button>'+
+    '<button class="msg-act" data-act="regen-img">🔁 Ещё вариант</button></div></div>';
+  d._img=msg;msgsEl.appendChild(d);scrollBottom(true);
+  var img=d.querySelector('.gen-img');
+  if(liveSrc){IMG_STORE[msg.key]=liveSrc;img.src=liveSrc;}
+  else if(msg.thumb){img.src=msg.thumb;}
+  if(!liveSrc&&msg.key){
+    idbGet(msg.key).then(function(full){
+      if(full){IMG_STORE[msg.key]=full;img.src=full;}
+      else if(!msg.thumb){
+        var w=d.querySelector('.gen-wrap');
+        if(w)w.innerHTML='<div class="gen-missing">🖼 Оригинал удалён из кэша. Нажмите «🔁 Ещё вариант».</div>';
+      }
+    });
+  }
+  return d;
+}
+function consiliumCard(ids){
+  var d=document.createElement('div');d.className='consilium-card';
+  d.innerHTML='<div class="cc-title">⚡ Совместные модели · параллельный опрос</div><div class="cc-chips">'+
+    ids.map(function(m){return '<span class="cc-chip run" data-m="'+m+'">'+esc((META[m]&&META[m].badge)||m)+' <em>⏳</em></span>';}).join('')+
+    '</div><div class="cc-phase">Опрашиваю модели…</div>';
+  msgsEl.appendChild(d);scrollBottom(true);
+  return {
+    set:function(m,ok,txt){var c=d.querySelector('[data-m="'+m+'"]');if(c){c.className='cc-chip '+(ok?'ok':'fail');c.querySelector('em').textContent=txt;}},
+    phase:function(t){d.querySelector('.cc-phase').textContent=t;}
+  };
+}
+function renderAll(){
+  msgsEl.innerHTML='';
+  var c=getChat();
+  if(!c||!c.messages.length){showWelcome();return;}
+  c.messages.forEach(function(m){
+    if(m.role==='user')appendUser(m);
+    else if(m.role==='note')addSysNote(m.content);
+    else if(m.role==='image')imageMessage(m,null);
+    else{var ai=createAi('',(META[m.model]&&META[m.model].badge)||m.model||'');ai.finalize(m);}
+  });
+  scrollBottom(true);
+}
+function streamRenderer(ai){
+  var pending=null,raf=null,last=0;
+  function flush(){raf=null;if(pending!==null){ai.render(pending,false);pending=null;}}
+  return function(full){
+    ai._partial=full;pending=full;
+    if(settings.speed==='turbo'){if(!raf)raf=requestAnimationFrame(flush);}
+    else{
+      var now=Date.now();
+      if(now-last>150){last=now;flush();}
+      else if(!raf)raf=requestAnimationFrame(function(){raf=null;if(Date.now()-last>150){last=Date.now();flush();}});
+    }
+  };
+}
+
+/* ------------------------- Puter: вход и модели ------------------------- */
+function waitPuter(){
+  if(window.puter&&puter.ai)return Promise.resolve();
+  if(puterWait)return puterWait;
+  puterWait=new Promise(function(res,rej){
+    var n=0,t=setInterval(function(){
+      if(window.puter&&puter.ai){clearInterval(t);res();}
+      else if(++n>80){clearInterval(t);puterWait=null;rej(new Error('Puter.js не загрузился — проверьте интернет'));}
+    },250);
+  });
+  return puterWait;
+}
+function authState(){
+  try{
+    if(!window.puter||!puter.auth)return 'offline';
+    if(puter.auth.isSignedIn())return guest?'guest':'user';
+    return 'anon';
+  }catch(e){return 'anon';}
+}
+/* Автоматический гостевой вход: тихо, без «Authentication canceled» */
+function ensureAuth(force){
+  return waitPuter().then(function(){
+    var st=authState();
+    if(st==='user'||st==='guest')return true;
+    if(authPromise&&!force)return authPromise;
+    authPromise=puter.auth.signIn({attempt_temp_user_creation:true}).then(function(){
+      guest=true;authPromise=null;refreshAccountUI();return true;
+    },function(e){
+      authPromise=null;
+      var code=(e&&(e.error||e.code))||'';
+      if(code==='not_available_in_app'||authState()!=='anon'){guest=true;refreshAccountUI();return true;}
+      throw new Error(authErrText(e));
+    });
+    return authPromise;
+  });
+}
+function authErrText(e){
+  var code=(e&&(e.error||e.code))||'';
+  if(code==='popup_blocked')return 'Вход заблокирован: нажмите «Войти» ещё раз (нужен тап по кнопке)';
+  if(code==='auth_window_closed')return 'Окно входа закрыто — гостевой режим доступен кнопкой «Гостевой вход»';
+  if(code==='unsupported_origin')return 'Вход невозможен с file:// — откройте приложение через локальный сервер';
+  return (e&&(e.msg||e.message))||'Не удалось войти в Puter';
+}
+function signInFull(){
+  if(!window.puter||!puter.auth){toast('Puter.js не загружен');return;}
+  buzz(15);
+  Promise.resolve(puter.auth.signIn({attempt_temp_user_creation:true,request_auth:true})).then(function(){
+    guest=false;toast('Аккаунт Puter подключён');refreshAccountUI();
+  },function(e){toast(authErrText(e));});
+}
+function signOutPuter(){
+  if(!window.puter||!puter.auth)return;
+  try{
+    Promise.resolve(puter.auth.signOut()).then(function(){
+      guest=false;toast('Вышли из Puter');refreshAccountUI();
+    },function(){toast('Не удалось выйти');});
+  }catch(e){toast('Не удалось выйти');}
+}
+function loadModels(){
+  return waitPuter().then(function(){
+    if(!puter.ai.listModels)return null;
+    return Promise.resolve(puter.ai.listModels()).then(function(list){
+      if(!list||!list.length)return null;
+      var set={};
+      list.forEach(function(m){
+        var id=typeof m==='string'?m:(m&&(m.id||m.model||m.name));
+        if(id)set[String(id).toLowerCase()]=true;
+      });
+      AVAIL=set;return set;
+    },function(){return null;});
+  },function(){return null;});
+}
+function resolveId(id){
+  var m=META[id];
+  if(!m||!m.aliases||!m.aliases.length)return id;
+  if(AVAIL){
+    for(var i=0;i<m.aliases.length;i++)if(AVAIL[m.aliases[i].toLowerCase()])return m.aliases[i];
+  }
+  return m.aliases[0];
+}
+function extractText(resp){
+  if(!resp)return '';
+  if(typeof resp==='string')return resp;
+  var m=resp.message||resp,c=m.content;
+  if(Array.isArray(c))c=c.map(function(p){return p&&p.text?p.text:'';}).join('');
+  if(typeof c==='string'&&c)return c;
+  if(typeof resp.text==='string'&&resp.text)return resp.text;
+  var s=String(resp);return s==='[object Object]'?'':s;
+}
+function errText(e){
+  if(!e)return 'Неизвестная ошибка';
+  if(e.name==='AbortError')return 'Остановлено';
+  if(typeof e==='string')return e.slice(0,300);
+  var src=e.error&&typeof e.error==='object'?e.error:e;
+  var m=src.message||src.msg||e.message||src.code||e.code||'';
+  if(typeof m==='object'){try{m=JSON.stringify(m);}catch(_){m='';}}
+  return String(m||'Ошибка запроса').slice(0,300);
+}
+function isAbort(e){
+  if(!e)return false;
+  if(e.name==='AbortError')return true;
+  var c=(e.error&&(e.error.code||e.error))||e.code||'';
+  return /abort/i.test(String(c))||/abort/i.test(errText(e));
+}
+function isQuota(e){
+  return /429|rate.?limit|quota|exceed|insufficient|usage_limit|too many|overload|capacity|permission|billing|credit/i.test(errText(e));
+}
+function isModelMiss(e){
+  return /model|not_found|unsupported|unknown|invalid|400|404/i.test(errText(e));
+}
+function callModel(modelId,messages,onDelta,signal,forceOnce){
+  var real=resolveId(modelId);
+  var once=forceOnce||settings.speed==='instant';
+  return ensureAuth().then(function(){
+    if(once)return puter.ai.chat(messages,{model:real,signal:signal}).then(function(r){
+      var t=extractText(r);if(onDelta)onDelta(t);return t;
+    });
+    return puter.ai.chat(messages,{model:real,stream:true,signal:signal}).then(function(resp){
+      if(!resp||typeof resp[Symbol.asyncIterator]!=='function'){
+        var t=extractText(resp);if(onDelta)onDelta(t);return t;
+      }
+      var it=resp[Symbol.asyncIterator](),full='';
+      function step(){
+        return it.next().then(function(r){
+          if(r.done)return full;
+          var p=r.value;
+          if(p&&p.type==='reasoning')return step();
+          var t=p&&typeof p.text==='string'?p.text:'';
+          if(t){full+=t;if(onDelta)onDelta(full);}
+          return step();
+        });
+      }
+      return step();
+    });
+  });
+}
+
+/* --------------------------- промпт и контекст --------------------------- */
+function sysPrompt(){
+  var compact=settings.speed!=='normal';
+  var p=compact
+    ? 'Ты — Kortex AI. Отвечай на русском, кратко и по делу. Markdown. Простые вопросы — 1–3 предложения.'
+    : 'Ты — Kortex AI, флагманский ИИ-ассистент в минималистичном Android-приложении. Отвечай на русском (если не просят иначе). Оформляй в Markdown: заголовки, списки, код — блоками с указанием языка. Будь точным и полезным.';
+  if(settings.plugins.study)p+='\n\nРЕЖИМ УЧЁБЫ: ты репетитор. Дано → метод → шаги с объяснением «почему» → ответ → мини-вывод. Доводи решение до конца.';
+  if(settings.plugins.dev)p+='\n\nРЕЖИМ РАЗРАБОТЧИКА: senior-инженер (Kotlin/Android, Web). Код в приоритете, комментарии на русском. HTML/CSS/JS-демо — ОДНИМ файлом в блоке ```html.';
+  if(settings.plugins.search)p+='\n\nВЕБ-ПОИСК: если есть блок [ВЕБ-ПОИСК] — опирайся на него и цитируй источники ссылками. Не выдумывай.';
+  return p;
+}
+function historyLimit(){return settings.speed==='instant'?6:settings.speed==='turbo'?12:20;}
+function makeMsgs(history,userT,imgs){
+  var msgs=[{role:'system',content:sysPrompt()}];
+  history.forEach(function(m){
+    if(m.role==='user'||m.role==='assistant')msgs.push({role:m.role,content:m.content});
+  });
+  if(imgs&&imgs.length){
+    var parts=[{type:'text',text:userT}];
+    imgs.forEach(function(u){parts.push({type:'image_url',image_url:{url:u}});});
+    msgs.push({role:'user',content:parts});
+  }else msgs.push({role:'user',content:userT});
+  return msgs;
+}
+function attachText(text,atts){
+  var t=text||'';
+  atts.forEach(function(a){
+    if(a.kind==='text')t+='\n\n[Файл '+a.name+']\n```\n'+a.text+'\n```';
+    else if(a.kind==='pdf')t+='\n\n[PDF '+a.name+', извлечённый текст]\n'+a.text;
+    else if(a.kind==='video')t+='\n[Видео '+a.name+(a.url?' — '+a.url:'')+': приложен первый кадр]';
+    else if(a.kind==='file')t+='\n[Файл '+a.name+(a.url?' — '+a.url:'')+']';
+  });
+  if(!t.trim())t='Проанализируй приложенные материалы и помоги решить задачу.';
+  return t;
+}
+function webSearch(q){
+  var out=[];
+  var ddg=fetchJson('https://api.duckduckgo.com/?q='+encodeURIComponent(q)+'&format=json&no_html=1&skip_disambig=1&t=kortexai',7000).catch(function(){return null;});
+  var wiki=fetchJson('https://ru.wikipedia.org/w/api.php?action=query&list=search&srsearch='+encodeURIComponent(q)+'&srlimit=3&format=json&origin=*',7000).catch(function(){return null;});
+  return Promise.all([ddg,wiki]).then(function(rs){
+    var d=rs[0],w=rs[1];
+    if(d){
+      if(d.AbstractText)out.push({t:d.Heading||q,s:d.AbstractText,u:d.AbstractURL});
+      (d.RelatedTopics||[]).slice(0,6).forEach(function(t){if(t.Text&&t.FirstURL)out.push({t:t.Text.split(' - ')[0],s:t.Text,u:t.FirstURL});});
+    }
+    if(w&&w.query&&w.query.search)w.query.search.forEach(function(r){
+      out.push({t:r.title,s:String(r.snippet).replace(/<[^>]+>/g,''),u:'https://ru.wikipedia.org/wiki/'+encodeURIComponent(r.title.replace(/ /g,'_'))});
+    });
+    if(!out.length)return '';
+    return '[ВЕБ-ПОИСК]\n'+out.slice(0,8).map(function(r,i){return (i+1)+'. '+r.t+' — '+r.s+' ('+r.u+')';}).join('\n')+
+      '\n[КОНЕЦ]\n\nВопрос пользователя: ';
+  });
+}
+
+/* ------------------------------ пайплайн ------------------------------ */
+function setSendState(){
+  $('#icoSend').classList.toggle('hidden',generating);
+  $('#icoStop').classList.toggle('hidden',!generating);
+  $('#btnSend').disabled=!generating&&!$('#input').value.trim()&&!attachments.length;
+}
+function updateModelBadge(){
+  var m=META[settings.model]||META['gpt-4o-mini'];
+  $('#modelBadgeText').textContent=m.name;
+  var tag=$('#speedTag');
+  tag.textContent=settings.speed==='instant'?'⚡⚡':settings.speed==='turbo'?'⚡':'';
+  tag.classList.toggle('hidden',settings.speed==='normal');
+}
+function chainFor(id){
+  var arr=[id];
+  FAST_CHAIN.forEach(function(m){if(arr.indexOf(m)<0)arr.push(m);});
+  return arr;
+}
+function sendMessage(opts){
+  opts=opts||{};
+  if(generating)return Promise.resolve();
+  var inputEl=$('#input');
+  var text=(opts.text!=null?String(opts.text):inputEl.value).trim();
+  var atts=opts.atts||attachments.slice();
+  var imageMode=opts.imageMode||settings.model==='image-hd';
+  if(!text&&!atts.length)return Promise.resolve();
+  if(opts.text==null){inputEl.value='';autosize();}
+  if(!opts.atts){attachments=[];renderAttachChips();}
+  var chat=getChat();
+  if(!chat){chat=newChatObj();chats.push(chat);currentId=chat.id;}
+  if(!chat.messages.length)msgsEl.innerHTML='';
+  var history=chat.messages.slice(-historyLimit());
+  var userMsg={id:uid(),role:'user',content:text,
+    atts:atts.map(function(a){return {name:a.name,kind:a.kind,size:a.size};}),ts:Date.now()};
+  chat.messages.push(userMsg);chat.updatedAt=Date.now();
+  if(chat.title==='Новый чат')chat.title=(text||atts[0].name).slice(0,48);
+  appendUser(userMsg);saveChats();renderChatList($('#chatSearch').value);
+  generating=true;abortCtrl=new AbortController();setSendState();
+  if(voice.active){stopListening();setVoiceState('thinking');}
+  var n=native();if(n&&n.setKeepScreenOn){try{n.setKeepScreenOn(true);}catch(e){}}
+
+  var finish=function(){
+    generating=false;abortCtrl=null;setSendState();
+    var nn=native();if(nn&&nn.setKeepScreenOn){try{nn.setKeepScreenOn(false);}catch(e){}}
+    if(voice.active){
+      if(voice.paused||!settings.voice.autoListen)setVoiceState('idle');
+    }
+  };
+  if(imageMode)return runImage(chat,text,atts).then(finish,finish);
+
+  var ai=createAi(settings.plugins.search?'🔍 Ищу в интернете…':'Думаю…',(META[settings.model]||{}).badge||'');
+  var searchCtx='';
+  var pre=(settings.plugins.search&&text)?webSearch(text).then(function(ctx){
+    searchCtx=ctx||'';
+    if(!ctx)addSysNote('🔍 Поиск не дал результатов — отвечаю без свежих данных');
+  }):Promise.resolve();
+
+  return pre.then(function(){
+    ai.setLabel('Думаю…');
+    var fullText=attachText(searchCtx?searchCtx+text:text,atts);
+    var imgs=atts.filter(function(a){return a.data&&(a.kind==='image'||a.kind==='video');});
+    if(imgs.length)return runVision(chat,fullText,imgs,history,ai);
+    var mk=function(){return makeMsgs(history,fullText,null);};
+    if(settings.model==='consilium')return runMulti(chat,mk,ai,fullText);
+    return runSingle(chat,mk,ai);
+  }).then(function(final){
+    var asMsg={id:uid(),role:'assistant',content:final.content,model:final.model,ts:Date.now()};
+    chat.messages.push(asMsg);chat.updatedAt=Date.now();saveChats();renderChatList($('#chatSearch').value);
+    ai.finalize(asMsg);
+    finish();
+    if(voice.active&&!voice.paused&&settings.voice.tts)speakAnswer(final.content);
+    else if(voice.active&&!voice.paused&&settings.voice.autoListen){setVoiceState('listening');startListening();}
+  },function(e){
+    var msg=isAbort(e)?((ai._partial?ai._partial+'\n\n':'')+'⏹ Генерация остановлена')
+      :('⚠️ '+errText(e));
+    var asMsg={id:uid(),role:'assistant',content:msg,model:settings.model,ts:Date.now()};
+    chat.messages.push(asMsg);saveChats();ai.finalize(asMsg);
+    finish();
+    if(!isAbort(e))toast(errText(e));
+  });
+}
+function runSingle(chat,mk,ai){
+  var render=streamRenderer(ai),tried=[],model=settings.model;
+  function attempt(){
+    return callModel(model,mk(),render,abortCtrl.signal).then(function(text){
+      if(!text||!text.trim())throw new Error('Пустой ответ модели');
+      return {content:text,model:model};
+    }).catch(function(e){
+      if(isAbort(e))throw e;
+      tried.push(model);
+      if(settings.dev.turboFallback&&isQuota(e))markCool(model,300000);
+      var next=null,chain=chainFor(settings.model);
+      for(var i=0;i<chain.length;i++){
+        var cand=chain[i];
+        if(tried.indexOf(cand)<0&&(!settings.dev.turboFallback||!isCooled(cand))){next=cand;break;}
+      }
+      if(!next){
+        for(var j=0;j<chain.length;j++)if(tried.indexOf(chain[j])<0){next=chain[j];break;}
+      }
+      if(!next)throw e;
+      var why=isQuota(e)?'лимит квоты':isModelMiss(e)?'модель недоступна':'ошибка';
+      var note='⚠️ '+((META[model]||{}).badge||model)+' — '+why+'. Переключаюсь → '+((META[next]||{}).badge||next);
+      addSysNote(note);chat.messages.push({id:uid(),role:'note',content:note,ts:Date.now()});
+      model=next;ai._partial='';ai.tag.textContent=(META[next]||{}).badge||next;
+      ai.setLabel('Думаю… ('+((META[next]||{}).badge||next)+')');
+      return (settings.dev.turboFallback?Promise.resolve():sleep(350)).then(attempt);
+    });
+  }
+  return attempt();
+}
+function runMulti(chat,mk,ai,fullText){
+  ai.setLabel('⚡ Совместные модели работают…');
+  var ids=CONSILIUM.filter(function(m){return !settings.dev.turboFallback||!isCooled(m);});
+  if(ids.length<2)ids=CONSILIUM.slice();
+  var card=consiliumCard(ids),signal=abortCtrl.signal;
+  var tasks=ids.map(function(m){
+    var start=Date.now();
+    return callModel(m,mk(),null,signal,true).then(function(text){
+      if(!text||!text.trim())throw new Error('Пустой ответ');
+      card.set(m,true,'✓ '+Math.max(1,Math.round((Date.now()-start)/1000))+'с');
+      return {m:m,text:text};
+    }).catch(function(e){
+      card.set(m,false,isAbort(e)?'⏹':'✕');
+      if(settings.dev.turboFallback&&isQuota(e))markCool(m,300000);
+      return {m:m,err:errText(e),aborted:isAbort(e)};
+    });
+  });
+  return Promise.all(tasks).then(function(results){
+    var ok=results.filter(function(r){return r.text;});
+    if(!ok.length){
+      if(results.some(function(r){return r.aborted;})){var ae=new Error('aborted');ae.name='AbortError';throw ae;}
+      card.phase('Совместные модели недоступны — включаю быстрый обход');
+      settings.model='gpt-4o-mini';saveSettings();updateModelBadge();
+      return runSingle(chat,mk,ai);
+    }
+    if(ok.length===1){card.phase('Ответила одна модель — использую её ответ');return {content:ok[0].text,model:ok[0].m};}
+    card.phase('🧩 Объединяю ответы ('+ok.length+' из '+ids.length+')…');
+    ai.setLabel('🧩 Объединяю…');
+    var synth=[
+      {role:'system',content:'Ты — объединитель ответов Kortex. Из вопроса пользователя и ответов нескольких нейросетей составь ОДИН идеальный финальный ответ на русском: лучшее из каждого, противоречия реши в пользу фактов, убери дубли и воду. Markdown, код — блоками с языком. Не упоминай другие модели и процесс объединения.'},
+      {role:'user',content:'Вопрос:\n'+fullText+'\n\n'+ok.map(function(r,i){
+        return '=== Ответ '+(i+1)+' ('+((META[r.m]||{}).badge||r.m)+') ===\n'+r.text;}).join('\n\n')+
+        '\n\nДай финальный идеальный ответ.'}
+    ];
+    var render=streamRenderer(ai);
+    function trySynth(k){
+      if(k>=SYNTH.length){
+        card.phase('Объединитель недоступен — показываю все ответы');
+        return {content:'## ⚡ Ответы моделей\n\n'+ok.map(function(r){
+          return '### '+((META[r.m]||{}).badge||r.m)+'\n\n'+r.text;}).join('\n\n---\n\n'),model:'consilium'};
+      }
+      return callModel(SYNTH[k],synth,render,signal).then(function(text){
+        card.phase('✓ Готово · объединено '+ok.length+' ответами');
+        return {content:text,model:'consilium'};
+      }).catch(function(e){
+        if(isAbort(e))throw e;
+        return trySynth(k+1);
+      });
+    }
+    return trySynth(0);
+  });
+}
+/* Фото в нейросеть: puter.ai.chat(prompt, imageFile) + запасные пути */
+function runVision(chat,fullText,imgs,history,ai){
+  var model=VISION[settings.model]?settings.model:'gpt-4o';
+  var render=streamRenderer(ai);
+  var ctx=history.filter(function(m){return m.role==='user'||m.role==='assistant';}).slice(-4)
+    .map(function(m){return (m.role==='user'?'Пользователь: ':'Ассистент: ')+String(m.content).slice(0,700);}).join('\n');
+  var prompt=sysPrompt()+(ctx?'\n\nКонтекст диалога:\n'+ctx:'')+'\n\n'+fullText;
+  ai.tag.textContent=(META[model]||{}).badge||model;
+  ai.setLabel('🖼 Смотрю фото…');
+  var first=imgs[0];
+  function viaFile(){
+    return ensureAuth().then(function(){
+      var payload=first.file||first.data;
+      return puter.ai.chat(prompt,payload,{model:resolveId(model),stream:true,signal:abortCtrl.signal});
+    }).then(consumeStream);
+  }
+  function viaMessages(){
+    return callModel(model,makeMsgs(history,fullText,imgs.map(function(a){return a.data;})),render,abortCtrl.signal);
+  }
+  function consumeStream(resp){
+    if(!resp||typeof resp[Symbol.asyncIterator]!=='function'){
+      var t=extractText(resp);render(t);return t;
+    }
+    var it=resp[Symbol.asyncIterator](),full='';
+    function step(){
+      return it.next().then(function(r){
+        if(r.done)return full;
+        var p=r.value;
+        if(p&&p.type==='reasoning')return step();
+        var t=p&&typeof p.text==='string'?p.text:'';
+        if(t){full+=t;render(full);}
+        return step();
+      });
+    }
+    return step();
+  }
+  return viaFile().catch(function(e){
+    if(isAbort(e))throw e;
+    ai.setLabel('🖼 Пробую другой путь…');
+    return viaMessages();
+  }).catch(function(e){
+    if(isAbort(e))throw e;
+    if(settings.dev.turboFallback&&isQuota(e))markCool(model,300000);
+    var alt=model==='gpt-4o'?'gpt-4o-mini':'gpt-4o';
+    addSysNote('⚠️ '+((META[model]||{}).badge||model)+' не смогла обработать фото. Переключаюсь → '+((META[alt]||{}).badge||alt));
+    model=alt;ai.tag.textContent=(META[alt]||{}).badge||alt;
+    return callModel(alt,makeMsgs(history,fullText,imgs.map(function(a){return a.data;})),render,abortCtrl.signal);
+  }).then(function(text){
+    return {content:text,model:model};
+  });
+}
+/* 🎨 Генератор фото HD */
+function runImage(chat,text,atts){
+  var ai=createAi('🎨 Рисую в высоком качестве…','Фото HD');
+  var prompt=text||'Красивый детализированный арт';
+  var ref=atts.filter(function(a){return a.kind==='image';})[0];
+  var attempts=[
+    function(){var o={quality:'high'};if(ref)o.input_image=ref.file||ref.data;return puter.ai.txt2img(prompt,o);},
+    function(){return puter.ai.txt2img(prompt);},
+    function(){return puter.ai.txt2img({prompt:prompt,quality:'high'});}
+  ];
+  function tryGen(k){
+    if(k>=attempts.length)throw new Error('Генерация фото недоступна: проверьте вход Puter и квоту');
+    return ensureAuth().then(function(){return attempts[k]();}).then(function(img){
+      var src=img&&img.src?img.src:(typeof img==='string'?img:'');
+      if(!src)throw new Error('Пустой результат генерации');
+      return src;
+    }).catch(function(e){
+      if(isAbort(e))throw e;
+      if(k===attempts.length-1)throw e;
+      ai.setLabel('🎨 Пробую другой режим…');
+      return tryGen(k+1);
+    });
+  }
+  return tryGen(0).then(function(src){
+    ai.node.parentNode.removeChild(ai.node);
+    return makeThumb(src,1024).then(function(thumb){
+      var key='img-'+uid();
+      var msg={id:uid(),role:'image',prompt:prompt,key:key,thumb:thumb,ts:Date.now()};
+      chat.messages.push(msg);chat.updatedAt=Date.now();
+      return idbPut(key,src).then(function(){
+        saveChats();renderChatList($('#chatSearch').value);
+        imageMessage(msg,src);
+      });
+    });
+  }).catch(function(e){
+    ai.finalize({content:'⚠️ '+errText(e),model:'image-hd'});
+    chat.messages.push({id:uid(),role:'assistant',content:'⚠️ '+errText(e),model:'image-hd',ts:Date.now()});
+    saveChats();toast(errText(e));
+  });
+}
+
+/* ------------------------------ вложения ------------------------------ */
+var TEXT_EXT=/\.(txt|md|json|csv|log|py|js|mjs|ts|jsx|tsx|html|htm|css|scss|xml|yml|yaml|kt|kts|java|c|cpp|h|cs|go|rs|rb|php|sh|bat|gradle|properties|sql)$/i;
+function readDataURL(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=function(){rej(new Error('read'));};r.readAsDataURL(f);});}
+function readText(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=function(){rej(new Error('read'));};r.readAsText(f);});}
+function readBuf(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(r.result);};r.onerror=function(){rej(new Error('read'));};r.readAsArrayBuffer(f);});}
+function loadImg(src){
+  return new Promise(function(res,rej){
+    var im=new Image();
+    im.onload=function(){res(im);};
+    im.onerror=function(){rej(new Error('img'));};
+    im.src=src;
+  });
+}
+function makeThumb(src,max){
+  return loadImg(src).then(function(im){
+    var w=im.naturalWidth||im.width,h=im.naturalHeight||im.height;
+    if(!w||!h)return src;
+    var k=Math.min(1,(max||512)/Math.max(w,h));
+    var c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
+    c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+    try{return c.toDataURL('image/jpeg',0.72);}catch(e){return src;}
+  }).catch(function(){return '';});
+}
+function videoFrame(file){
+  return new Promise(function(res){
+    var url=URL.createObjectURL(file),v=document.createElement('video'),done=false;
+    v.muted=true;v.playsInline=true;v.preload='metadata';v.src=url;
+    function finish(val){
+      if(done)return;done=true;
+      try{URL.revokeObjectURL(url);}catch(e){}
+      res(val);
+    }
+    var timer=setTimeout(function(){finish('');},4000);
+    v.onloadeddata=function(){try{v.currentTime=Math.min(0.2,(v.duration||1)/3);}catch(e){finish('');}};
+    v.onseeked=function(){
+      try{
+        var c=document.createElement('canvas');
+        var k=Math.min(1,640/Math.max(v.videoWidth||1,v.videoHeight||1));
+        c.width=Math.max(1,Math.round((v.videoWidth||320)*k));
+        c.height=Math.max(1,Math.round((v.videoHeight||240)*k));
+        c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+        clearTimeout(timer);finish(c.toDataURL('image/jpeg',0.75));
+      }catch(e){clearTimeout(timer);finish('');}
+    };
+    v.onerror=function(){clearTimeout(timer);finish('');};
+  });
+}
+function pdfText(file){
+  if(!window.pdfjsLib)return Promise.resolve('');
+  try{
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }catch(e){}
+  return readBuf(file).then(function(buf){
+    return pdfjsLib.getDocument({data:buf}).promise.then(function(doc){
+      var pages=Math.min(doc.numPages,8),chain=Promise.resolve('');
+      for(var i=1;i<=pages;i++){
+        (function(num){
+          chain=chain.then(function(acc){
+            return doc.getPage(num).then(function(p){return p.getTextContent();}).then(function(tc){
+              var s=tc.items.map(function(it){return it.str;}).join(' ');
+              return acc+'\n--- стр. '+num+' ---\n'+s;
+            });
+          });
+        })(i);
+      }
+      return chain.then(function(t){return t.slice(0,24000);});
+    });
+  }).catch(function(){return '';});
+}
+function uploadLocal(file){
+  return fetch('/__upload?name='+encodeURIComponent(file.name),{method:'POST',body:file})
+    .then(function(r){return r.json();})
+    .then(function(j){return j&&j.ok?j:null;})
+    .catch(function(){return null;});
+}
+function addFiles(files){
+  var list=Array.prototype.slice.call(files);
+  function next(i){
+    if(i>=list.length){renderAttachChips();return Promise.resolve();}
+    if(attachments.length>=6){toast('Максимум 6 файлов');renderAttachChips();return Promise.resolve();}
+    var f=list[i],p;
+    if(/^image\//.test(f.type)){
+      if(f.size>12*1024*1024){toast('Фото больше 12 МБ пропущено');p=Promise.resolve();}
+      else p=readDataURL(f).then(function(data){
+        return makeThumb(data,512).then(function(th){
+          attachments.push({id:uid(),name:f.name,kind:'image',mime:f.type,size:f.size,data:data,thumb:th||data,file:f});
+        });
+      });
+    }else if(/^video\//.test(f.type)){
+      toast('🎬 Обрабатываю видео '+f.name+'…');
+      p=Promise.all([videoFrame(f),uploadLocal(f)]).then(function(r){
+        var frame=r[0],up=r[1];
+        attachments.push({id:uid(),name:f.name,kind:'video',mime:f.type,size:f.size,
+          data:frame||'',thumb:frame||'',url:up?location.origin+up.url:''});
+        if(!frame)toast('Кадр из видео не получен — отправлю ссылкой');
+      });
+    }else if(/pdf$/i.test(f.type)||/\.pdf$/i.test(f.name)){
+      toast('📄 Читаю PDF '+f.name+'…');
+      p=Promise.all([pdfText(f),uploadLocal(f)]).then(function(r){
+        var txt=r[0],up=r[1];
+        attachments.push({id:uid(),name:f.name,kind:txt?'pdf':'file',mime:f.type,size:f.size,
+          text:txt||'',url:up?location.origin+up.url:''});
+        if(!txt)toast('Текст PDF не извлечён — файл прикреплён ссылкой');
+      });
+    }else if(/^text\//.test(f.type)||TEXT_EXT.test(f.name)){
+      if(f.size>1024*1024){toast('Текстовый файл больше 1 МБ пропущен');p=Promise.resolve();}
+      else p=readText(f).then(function(t){
+        if(t.length>150000)t=t.slice(0,150000)+'\n…(обрезано)';
+        attachments.push({id:uid(),name:f.name,kind:'text',mime:f.type||'text/plain',size:f.size,text:t});
+      });
+    }else{
+      p=uploadLocal(f).then(function(up){
+        attachments.push({id:uid(),name:f.name,kind:'file',mime:f.type,size:f.size,url:up?location.origin+up.url:''});
+        if(!up)toast('Не удалось загрузить '+f.name);
+      });
+    }
+    return p.catch(function(){toast('Ошибка чтения '+f.name);}).then(function(){return next(i+1);});
+  }
+  return next(0);
+}
+function renderAttachChips(){
+  var row=$('#attachRow');
+  row.innerHTML=attachments.map(function(a){
+    var ico=a.kind==='image'?'🖼':a.kind==='video'?'🎬':'📄';
+    var prev=a.thumb?'<img class="att-thumb" src="'+esc(a.thumb)+'" alt="">':'<span class="att-ico">'+ico+'</span>';
+    return '<span class="att-card">'+prev+'<span class="att-meta"><b>'+esc(a.name)+'</b><i>'+fmtSize(a.size)+
+      '</i></span><button data-id="'+a.id+'" aria-label="Убрать">✕</button></span>';
+  }).join('');
+  row.classList.toggle('hidden',!attachments.length);
+  setSendState();
+}
+
+/* --------------------------- плагины и модели --------------------------- */
+function renderPluginChips(){
+  var html='';
+  Object.keys(settings.plugins).forEach(function(k){
+    if(settings.plugins[k])html+='<button class="plugin-chip" data-pl="'+k+'">'+PL_LABEL[k]+' ✕</button>';
+  });
+  if(settings.model==='image-hd')html+='<button class="plugin-chip" data-pl="photo">🎨 Фото HD ✕</button>';
+  $('#pluginChips').innerHTML=html;
+  $('#pluginChips').classList.toggle('hidden',!html);
+}
+function syncSwitches(){
+  $('#swSearch').classList.toggle('on',!!settings.plugins.search);
+  $('#swStudy').classList.toggle('on',!!settings.plugins.study);
+  $('#swDev').classList.toggle('on',!!settings.plugins.dev);
+  $('#swAutoListen').classList.toggle('on',!!settings.voice.autoListen);
+  $('#swTts').classList.toggle('on',!!settings.voice.tts);
+  $('#swFps60').classList.toggle('on',!!settings.dev.fps60);
+  $('#swTurboFb').classList.toggle('on',!!settings.dev.turboFallback);
+}
+function togglePlugin(k){
+  if(k==='photo'){setModel('gpt-4o-mini');return;}
+  settings.plugins[k]=!settings.plugins[k];
+  saveSettings();syncSwitches();renderPluginChips();
+  toast(PL_LABEL[k]+(settings.plugins[k]?' включён':' выключен'));
+}
+function renderModelList(){
+  $('#modelList').innerHTML=MODELS.map(function(m){
+    var sel=m.id===settings.model,cool=isCooled(m.id);
+    return '<button class="model-item'+(sel?' selected':'')+'" data-m="'+m.id+'">'+
+      '<span class="mi-name">'+esc(m.name)+(sel?'<span class="mi-check">✓</span>':'')+
+      (cool?'<span class="mi-cool">лимит</span>':'')+'</span>'+
+      '<span class="mi-desc">'+esc(m.desc)+'</span></button>';
+  }).join('');
+}
+function setModel(id){
+  if(!META[id])return;
+  settings.model=id;saveSettings();updateModelBadge();renderPluginChips();
+  $('#input').placeholder=id==='image-hd'?'Опишите картинку, которую нарисовать…':'Сообщение Kortex AI…';
+  toast('Модель: '+META[id].name);
+}
+function setSpeed(s){
+  settings.speed=s;saveSettings();updateModelBadge();syncSpeedUI();
+  toast('Скорость: '+(s==='instant'?'мгновенный ответ':s==='turbo'?'турбо-стрим':'обычный режим'));
+}
+function syncSpeedUI(){
+  $('#spdNormal').classList.toggle('active',settings.speed==='normal');
+  $('#spdTurbo').classList.toggle('active',settings.speed==='turbo');
+  $('#spdInstant').classList.toggle('active',settings.speed==='instant');
+}
+function applyFps(){document.body.classList.toggle('fps60',!!settings.dev.fps60);}
+
+/* ------------------------------ история ------------------------------ */
+function renderChatList(filter){
+  var f=(filter||'').toLowerCase(),list=sortedChats();
+  if(f)list=list.filter(function(c){
+    return c.title.toLowerCase().indexOf(f)>=0||c.messages.some(function(m){
+      return String(m.content||m.prompt||'').toLowerCase().indexOf(f)>=0;});
+  });
+  $('#chatList').innerHTML=list.map(function(c){
+    return '<div class="chat-item'+(c.id===currentId?' active':'')+'" data-id="'+c.id+'">'+
+      '<span class="ci-title">'+esc(c.title)+'</span>'+
+      '<button class="ci-btn ci-ren" title="Переименовать">✎</button>'+
+      '<button class="ci-btn ci-del" title="Удалить">✕</button></div>';
+  }).join('')||'<div class="ci-empty">Ничего не найдено</div>';
+}
+function selectChat(id){currentId=id;renderAll();renderChatList($('#chatSearch').value);closeOverlays();}
+function newChat(){
+  var c=getChat();
+  if(c&&!c.messages.length){closeOverlays();$('#input').focus();return;}
+  var n=newChatObj();chats.push(n);currentId=n.id;
+  saveChats();renderAll();renderChatList();closeOverlays();$('#input').focus();
+}
+function deleteChat(id){
+  chats=chats.filter(function(c){return c.id!==id;});
+  if(!chats.length)chats.push(newChatObj());
+  if(currentId===id)currentId=sortedChats()[0].id;
+  saveChats();renderAll();renderChatList($('#chatSearch').value);toast('Чат удалён');
+}
+function startRename(item,id){
+  var c=null;chats.forEach(function(x){if(x.id===id)c=x;});
+  if(!c)return;
+  var titleEl=item.querySelector('.ci-title');
+  var inp=document.createElement('input');inp.className='ci-edit';inp.value=c.title;
+  titleEl.parentNode.replaceChild(inp,titleEl);inp.focus();inp.select();
+  var done=false;
+  function commit(ok){
+    if(done)return;done=true;
+    if(ok&&inp.value.trim()){c.title=inp.value.trim().slice(0,60);saveChats();}
+    renderChatList($('#chatSearch').value);
+  }
+  inp.addEventListener('keydown',function(e){
+    if(e.key==='Enter')commit(true);else if(e.key==='Escape')commit(false);
+    e.stopPropagation();
+  });
+  inp.addEventListener('blur',function(){commit(true);});
+  inp.addEventListener('click',function(e){e.stopPropagation();});
+}
+function openSidebar(){renderChatList($('#chatSearch').value);refreshAccountUI();$('#sidebar').classList.add('open');$('#backdrop').classList.remove('hidden');}
+function openPlus(){syncSwitches();$('#plusSheet').classList.add('open');$('#backdrop').classList.remove('hidden');}
+function closeOverlays(){
+  $('#sidebar').classList.remove('open');
+  $('#plusSheet').classList.remove('open');
+  $('#backdrop').classList.add('hidden');
+}
+function exportHistory(){
+  var payload=JSON.stringify({app:'Kortex AI',version:VER,exportedAt:new Date().toISOString(),chats:chats},null,1);
+  var name='kortex-history-'+new Date().toISOString().slice(0,10)+'.json';
+  var n=native();
+  if(n&&n.saveDocument){n.saveDocument(name,'application/json',payload);return;}
+  if(n&&n.saveTextFile){n.saveTextFile(name,payload);return;}
+  var blob=new Blob([payload],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+  toast('Экспорт: '+name);
+}
+function clearHistory(){
+  askConfirm('Удалить все чаты и историю сообщений? Это действие нельзя отменить.',function(){
+    chats=[newChatObj()];currentId=chats[0].id;
+    persistNow();renderAll();renderChatList();updateStorageInfo();toast('История очищена');
+  });
+}
+function clearMedia(){
+  askConfirm('Очистить кэш картинок и вложений? Сгенерированные фото останутся только в превью.',function(){
+    idbClear().then(function(){updateStorageInfo();toast('Медиа-кэш очищен');});
+  });
+}
+function updateStorageInfo(){
+  var bytes=0;
+  try{bytes=(localStorage.getItem(LS_CHATS)||'').length;}catch(e){}
+  var txt='Чатов: '+chats.length+' · история ≈ '+fmtSize(bytes);
+  if(navigator.storage&&navigator.storage.estimate){
+    navigator.storage.estimate().then(function(est){
+      $('#storageInfo').textContent=txt+' · медиа ≈ '+fmtSize(est.usage||0);
+    },function(){$('#storageInfo').textContent=txt;});
+  }else $('#storageInfo').textContent=txt;
+}
+
+/* --------------------- настройки и центр аккаунтов --------------------- */
+function accState(id){return (settings.accounts[id]&&settings.accounts[id].state)||'none';}
+function setAcc(id,state){
+  settings.accounts[id]={state:state,ts:Date.now()};saveSettings();renderAccounts();
+}
+function renderAccounts(){
+  $('#accList').innerHTML=SERVICES.map(function(s){
+    var st=accState(s.id);
+    var label=st==='linked'?'Подключён':st==='opened'?'Открыт — вход не подтверждён':'Не подключён';
+    return '<div class="acc-row" data-svc="'+s.id+'">'+
+      '<span class="acc-dot '+st+'" style="--c:'+s.color+'"></span>'+
+      '<span class="acc-txt"><b>'+esc(s.name)+'</b><i>'+label+'</i></span>'+
+      '<span class="acc-btns">'+
+      '<button class="acc-btn acc-open">'+(st==='linked'?'Открыть':'Войти')+'</button>'+
+      (st==='linked'?'<button class="acc-btn acc-unlink">Сброс</button>':'<button class="acc-btn acc-link">Готово</button>')+
+      '</span></div>';
+  }).join('');
+}
+function refreshAccountUI(){
+  var st=authState(),label,cls;
+  if(st==='offline'){label='Нет сети / SDK не загружен';cls='none';}
+  else if(st==='anon'){label='Не подключён — нажмите «Гостевой вход»';cls='none';}
+  else if(st==='guest'){label='Гость (временный аккаунт) — чат работает';cls='opened';}
+  else{label='Аккаунт подключён';cls='linked';}
+  $('#accPuterStatus').textContent=label;
+  $('#accPuterDot').className='acc-dot '+cls;
+  $('#authName').textContent=st==='user'?'Puter · аккаунт':st==='guest'?'Puter · гость':'Puter · войти';
+  if(st==='user'&&puter.auth.getUser){
+    Promise.resolve(puter.auth.getUser()).then(function(u){
+      if(u&&u.username){
+        if(u.is_temporary){guest=true;$('#accPuterStatus').textContent='Гость @'+u.username+' — чат работает';$('#authName').textContent='Puter · гость';}
+        else{$('#accPuterStatus').textContent='@'+u.username+' — аккаунт Puter подключён';$('#authName').textContent='Puter · @'+u.username;}
+      }
+    },function(){});
+  }
+  renderAccounts();
+}
+function openSettings(){
+  closeOverlays();syncSwitches();refreshAccountUI();updateStorageInfo();
+  $('#aboutVer').textContent='Kortex AI v'+VER+' · скорость: '+
+    (settings.speed==='instant'?'мгновенный ответ':settings.speed==='turbo'?'турбо-стрим':'обычный')+
+    (settings.dev.unlocked?' · 🛠 Developer':'');
+  $('#settingsOverlay').classList.remove('hidden');
+}
+function openService(id){
+  var svc=null;SERVICES.forEach(function(s){if(s.id===id)svc=s;});
+  if(!svc)return;
+  try{localStorage.setItem(LS_PEND,JSON.stringify({id:id,name:svc.name,ts:Date.now()}));}catch(e){}
+  if(accState(id)==='none')setAcc(id,'opened');
+  closeOverlays();$('#settingsOverlay').classList.add('hidden');
+  location.href=svc.url;
+}
+function checkPendingLink(){
+  var raw=null;
+  try{raw=localStorage.getItem(LS_PEND);}catch(e){}
+  if(!raw)return;
+  try{localStorage.removeItem(LS_PEND);}catch(e){}
+  var p=null;try{p=JSON.parse(raw);}catch(e){return;}
+  if(!p||!p.id)return;
+  if(Date.now()-(p.ts||0)>3600000)return;
+  setTimeout(function(){
+    askConfirm('Вы вошли в аккаунт '+p.name+'? Отметить сервис как подключённый?',function(){
+      setAcc(p.id,'linked');toast(p.name+' отмечен как подключённый');
+    });
+  },700);
+}
+
+/* --------------------------- голосовой режим --------------------------- */
+function setVoiceState(s){
+  voice.state=s;
+  $('#voiceOverlay').setAttribute('data-state',s);
+  var labels={idle:voice.paused?'Пауза':'Готовлюсь…',listening:'Слушаю…',thinking:'Думаю…',speaking:'Отвечаю…'};
+  $('#voiceStatus').textContent=labels[s]||s;
+  if(s!=='listening')rmsTarget=s==='speaking'?0.5:0.05;
+}
+function sphereLoop(ts){
+  rafId=requestAnimationFrame(sphereLoop);
+  var step=settings.dev.fps60?0:32;
+  if(step&&ts-lastFrame<step)return;
+  lastFrame=ts;
+  if(voice.state==='speaking')rmsTarget=0.34+0.26*Math.abs(Math.sin(ts/230));
+  if(voice.state==='thinking')rmsTarget=0.16+0.12*Math.abs(Math.sin(ts/400));
+  rmsCur+=(rmsTarget-rmsCur)*(settings.dev.fps60?0.25:0.18);
+  $('#sphereWrap').style.setProperty('--rms',rmsCur.toFixed(3));
+}
+function makeFallbackRec(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return null;
+  var r=new SR();r.lang='ru-RU';r.continuous=true;r.interimResults=true;
+  r.onstart=function(){window.KortexVoice.onListeningStart();};
+  r.onresult=function(e){
+    var interim='',final='';
+    for(var i=e.resultIndex;i<e.results.length;i++){
+      var res=e.results[i];
+      if(res.isFinal)final+=res[0].transcript;else interim+=res[0].transcript;
+    }
+    if(interim)window.KortexVoice.onPartial(interim);
+    if(final.trim())window.KortexVoice.onResult(final.trim(),true);
+  };
+  r.onerror=function(e){window.KortexVoice.onError('Распознавание: '+(e.error||'ошибка'));};
+  r.onend=function(){
+    if(voice.active&&!voice.paused&&!generating&&voice.state==='listening'){try{r.start();}catch(e){}}
+  };
+  return r;
+}
+function startListening(){
+  var n=native();
+  if(n){n.startListening();return;}
+  if(!voice.rec)voice.rec=makeFallbackRec();
+  if(voice.rec){try{voice.rec.start();}catch(e){}}
+  else{toast('Распознавание речи недоступно');closeVoice();}
+}
+function stopListening(){
+  var n=native();if(n)n.stopListening();
+  if(voice.rec){try{voice.rec.stop();}catch(e){}}
+}
+function openVoice(){
+  var n=native();
+  if(n&&n.isVoiceInputSupported&&!n.isVoiceInputSupported()){
+    toast('На устройстве нет службы распознавания речи');return;
+  }
+  if(!n&&!window.SpeechRecognition&&!window.webkitSpeechRecognition){
+    toast('Распознавание речи недоступно в этой среде');return;
+  }
+  voice.active=true;voice.paused=false;
+  $('#voiceOverlay').classList.remove('hidden');
+  $('#voiceTranscript').textContent='';
+  $('#voiceTranscript').className='';
+  setVoiceState('idle');
+  if(!rafId)rafId=requestAnimationFrame(sphereLoop);
+  startListening();
+}
+function closeVoice(){
+  voice.active=false;voice.paused=false;
+  stopListening();
+  var n=native();if(n)n.stopSpeaking();
+  if(window.speechSynthesis){try{speechSynthesis.cancel();}catch(e){}}
+  $('#voiceOverlay').classList.add('hidden');
+  if(rafId){cancelAnimationFrame(rafId);rafId=null;}
+  rmsCur=0;rmsTarget=0;
+  $('#sphereWrap').style.setProperty('--rms','0');
+}
+function stripForSpeech(s){
+  return String(s)
+    .replace(/```[\s\S]*?```/g,' Код показан в чате. ')
+    .replace(/`([^`]+)`/g,'$1')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g,'')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g,'$1')
+    .replace(/https?:\/\/\S+/g,'')
+    .replace(/[\u2600-\u27BF\uFE0F]/g,' ').replace(/\uD83C[\uDF00-\uDFFF]|\uD83D[\uDC00-\uDE4F\uDE80-\uDEFF]|\uD83E[\uDD00-\uDDFF]/g,' ')
+    .replace(/[*_#>|~]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim().slice(0,6000);
+}
+function speakAnswer(md){
+  var plain=stripForSpeech(md);
+  if(!plain){if(voice.active){setVoiceState('listening');startListening();}return;}
+  if(voice.active)setVoiceState('speaking');
+  var n=native();
+  if(n&&n.isTtsReady&&!n.isTtsReady()){toast('Русский голос TTS не установлен');if(n.openTtsSettings)n.openTtsSettings();return;}
+  if(n){n.speak(plain);return;}
+  if(window.speechSynthesis){
+    var u=new SpeechSynthesisUtterance(plain.slice(0,4000));
+    u.lang='ru-RU';u.rate=1.0;
+    var vs=speechSynthesis.getVoices();
+    for(var i=0;i<vs.length;i++)if(/^ru/i.test(vs[i].lang)){u.voice=vs[i];break;}
+    u.onend=function(){window.KortexVoice.onSpeakEnd();};
+    u.onerror=function(){window.KortexVoice.onSpeakEnd();};
+    speechSynthesis.speak(u);
+  }else if(voice.active){setVoiceState('listening');startListening();}
+}
+window.KortexVoice={
+  onListeningStart:function(){if(voice.active)setVoiceState('listening');},
+  onListeningStop:function(){if(voice.active&&voice.state==='listening')setVoiceState('idle');},
+  onPartial:function(t){
+    if(!voice.active)return;
+    var el=$('#voiceTranscript');el.textContent=t;el.className='interim';
+  },
+  onResult:function(t,final){
+    if(!voice.active||!final||voice.paused)return;
+    var el=$('#voiceTranscript');el.textContent=t;el.className='final';
+    if(!generating){setVoiceState('thinking');sendMessage({text:t});}
+  },
+  onRms:function(l){rmsTarget=clamp(Number(l)||0,0,1);},
+  onError:function(m){
+    toast(m);
+    if(!voice.active)return;
+    if(/разрешени|permission|не найдена|недоступен|unavailable|установлен/i.test(m)){closeVoice();return;}
+    setTimeout(function(){if(voice.active&&!voice.paused&&!generating)startListening();},900);
+  },
+  onSpeakStart:function(){if(voice.active)setVoiceState('speaking');},
+  onSpeakEnd:function(){
+    if(!voice.active)return;
+    if(document.hidden){setVoiceState('idle');return;}
+    if(voice.paused||generating||!settings.voice.autoListen){setVoiceState('idle');return;}
+    $('#voiceTranscript').textContent='';$('#voiceTranscript').className='';
+    setVoiceState('listening');startListening();
+  }
+};
+window.KortexDownloads={onSaved:function(name){toast('Сохранено: '+name);}};
+
+/* ------------------------------ песочница ------------------------------ */
+function wrapHtml(code){
+  if(/<html[\s>]/i.test(code))return code;
+  return '<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8">'+
+    '<meta name="viewport" content="width=device-width,initial-scale=1">'+
+    '<style>body{font-family:system-ui,sans-serif;margin:16px;background:#fff;color:#111}</style>'+
+    '</head><body>'+code+'</body></html>';
+}
+function sbSetTab(t){
+  $('#sbBody').setAttribute('data-tab',t);
+  $('#sbTabCode').classList.toggle('active',t==='code');
+  $('#sbTabPreview').classList.toggle('active',t==='preview');
+}
+function openSandbox(code,autorun){
+  if(code!=null&&code!=='')$('#sbCode').value=code;
+  else if(!$('#sbCode').value)$('#sbCode').value=SB_DEFAULT;
+  $('#sandboxOverlay').classList.remove('hidden');
+  if(autorun)runSandbox();else sbSetTab('code');
+}
+function runSandbox(){$('#sbFrame').srcdoc=wrapHtml($('#sbCode').value);sbSetTab('preview');}
+function downloadSandbox(){
+  var doc=wrapHtml($('#sbCode').value);
+  var name='kortex-'+new Date().toISOString().slice(0,19).replace(/[T:]/g,'-')+'.html';
+  var n=native();
+  if(n&&n.saveDocument){n.saveDocument(name,'text/html',doc);return;}
+  if(n&&n.saveTextFile){n.saveTextFile(name,doc);return;}
+  var blob=new Blob([doc],{type:'text/html'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  setTimeout(function(){URL.revokeObjectURL(a.href);},4000);
+  toast('Скачан '+name);
+}
+function savePhoto(holder){
+  var msg=holder._img;if(!msg)return;
+  var src=IMG_STORE[msg.key]||holder.querySelector('.gen-img').src||msg.thumb||'';
+  if(!src){toast('Картинка недоступна — нажмите «Ещё вариант»');return;}
+  var name='kortex-photo-'+new Date().toISOString().slice(0,19).replace(/[T:]/g,'-')+'.png';
+  var n=native();
+  if(src.indexOf('data:')===0){
+    var mime=(src.slice(5).split(';')[0])||'image/png';
+    if(/jpeg|jpg/i.test(mime))name=name.replace(/\.png$/,'.jpg');
+    if(n&&n.saveBase64File){n.saveBase64File(name,mime,src.split(',')[1]||'');return;}
+    var a=document.createElement('a');a.href=src;a.download=name;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);toast('Скачан '+name);return;
+  }
+  if(n&&n.downloadUrl){n.downloadUrl(src,name);return;}
+  if(n&&n.openInBrowser){n.openInBrowser(src);return;}
+  window.open(src,'_blank');
+}
+
+/* ------------------------- пасхалка и dev-меню ------------------------- */
+function eggTap(){
+  var now=Date.now();
+  if(now-egg.last>1600)egg.count=0;
+  egg.last=now;egg.count++;
+  buzz(30);
+  if(egg.count>=15){
+    egg.count=0;
+    settings.dev.unlocked=true;saveSettings();
+    buzz(60);
+    openDev();
+    toast('🛠 Developer Turbo Menu открыт');
+    return;
+  }
+  if(egg.count>=9)toast('🛠 Ещё '+(15-egg.count)+' нажатий до Developer Menu');
+}
+function openDev(){
+  syncSwitches();syncSpeedUI();
+  $('#devModal').classList.remove('hidden');
+  devDiag();
+}
+function devDiag(){
+  var lines=[];
+  lines.push('Kortex AI v'+VER);
+  lines.push('Скорость: '+settings.speed+' · 60 FPS: '+(settings.dev.fps60?'вкл':'выкл')+' · Turbo Fallback: '+(settings.dev.turboFallback?'вкл':'выкл'));
+  lines.push('Puter: '+authState()+(guest?' (гость)':''));
+  lines.push('Модель: '+settings.model+' → '+resolveId(settings.model));
+  lines.push('Каталог моделей: '+(AVAIL?Object.keys(AVAIL).length+' доступно':'не загружен'));
+  var cooled=Object.keys(COOL).filter(function(k){return isCooled(k);});
+  lines.push('В обходе квот: '+(cooled.length?cooled.join(', '):'не
