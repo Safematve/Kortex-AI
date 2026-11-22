@@ -1,4 +1,4 @@
-name: Build Kortex AI APK
+name: Build Kortex AI v1.0.0
 
 on:
   push:
@@ -33,13 +33,15 @@ jobs:
       - name: Assemble Debug
         run: gradle assembleDebug --no-daemon --stacktrace
 
-      - name: Rename APK to Kortex-AI.apk
-        run: cp app/build/outputs/apk/debug/app-debug.apk Kortex-AI.apk
+      - name: Rename APK to Kortex-AI-v1.0.0.apk
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk Kortex-AI-v1.0.0.apk
+          ls -lh Kortex-AI-v1.0.0.apk
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Kortex-AI
-          path: Kortex-AI.apk
+          name: Kortex-AI-v1.0.0
+          path: Kortex-AI-v1.0.0.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
