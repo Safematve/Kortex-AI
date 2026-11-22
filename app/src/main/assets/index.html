@@ -326,3 +326,521 @@ body.fps60 .toast{animation-duration:.16s}
   .att-card{max-width:47%}
 }
          </style>
+         </head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <button class="icon-btn" id="btnMenu" aria-label="Меню">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <button id="modelBadge" aria-label="Выбор модели">
+      <span id="speedTag" class="hidden">⚡</span>
+      <span id="modelBadgeText">⚡ GPT-4o mini — мгновенно</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <button class="icon-btn" id="btnNewChat" aria-label="Новый чат">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </header>
+
+  <div id="chatScroll"><div id="messages"></div></div>
+
+  <footer id="composer">
+    <div id="attachRow" class="hidden"></div>
+    <div id="pluginChips" class="hidden"></div>
+    <div id="inputRow">
+      <button class="icon-btn" id="btnPlus" aria-label="Плагины и вложения">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <textarea id="input" rows="1" placeholder="Сообщение Kortex AI…"></textarea>
+      <button class="icon-btn" id="btnMic" aria-label="Голосовой ассистент">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+      </button>
+      <button class="send-btn" id="btnSend" aria-label="Отправить" disabled>
+        <svg id="icoSend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        <svg id="icoStop" class="hidden" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></svg>
+      </button>
+    </div>
+    <div id="composerHint">Kortex AI v1.0.0 · Puter.js · ответы ИИ могут содержать ошибки</div>
+  </footer>
+</div>
+
+<div id="backdrop" class="hidden"></div>
+
+<aside id="sidebar" aria-label="Боковая панель">
+  <div class="side-head">
+    <div class="brand"><div class="brand-mark egg-logo" id="brandLogo">K</div><span>Kortex AI</span></div>
+    <button class="icon-btn" id="btnCloseSide" aria-label="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <button class="side-new" id="btnNewChatSide">＋ Новый чат</button>
+  <input id="chatSearch" type="search" placeholder="Поиск по чатам…" autocomplete="off">
+  <div id="chatList"></div>
+  <div class="side-sep"></div>
+  <div class="side-label">Быстрый переход</div>
+  <nav id="svcLinks">
+    <button class="svc" data-svc="gemini"><span class="svc-dot" style="--c:#4285F4"></span>Google Gemini</button>
+    <button class="svc" data-svc="chatgpt"><span class="svc-dot" style="--c:#10A37F"></span>ChatGPT</button>
+    <button class="svc" data-svc="claude"><span class="svc-dot" style="--c:#D97757"></span>Claude</button>
+    <button class="svc" data-svc="deepseek"><span class="svc-dot" style="--c:#4D6BFE"></span>DeepSeek</button>
+    <button class="svc" data-svc="qwen"><span class="svc-dot" style="--c:#615CED"></span>Qwen Chat</button>
+    <button class="svc" data-svc="kimi"><span class="svc-dot" style="--c:#8E8E93"></span>Kimi</button>
+    <button class="svc" data-url="https://google.com"><span class="svc-dot" style="--c:#EA4335"></span>Google</button>
+  </nav>
+  <div class="side-sep"></div>
+  <button class="side-settings" id="btnOpenSettings">⚙️ Настройки и Центр аккаунтов</button>
+  <button class="side-auth" id="btnAuth"><span id="authName">Puter · войти</span></button>
+  <div class="side-foot">Kortex AI v1.0.0 · история хранится локально</div>
+</aside>
+
+<div id="plusSheet" class="sheet" aria-label="Плагины">
+  <div class="sheet-grip"></div>
+  <div class="sheet-title">Плагины и инструменты</div>
+  <button class="sheet-item" id="plSearch">
+    <span class="si-ico">🔍</span>
+    <span class="si-txt"><b>Веб-поиск</b><i>DuckDuckGo + Википедия как свежий контекст</i></span>
+    <span class="switch" id="swSearch"></span>
+  </button>
+  <button class="sheet-item" id="plStudy">
+    <span class="si-ico">🎓</span>
+    <span class="si-txt"><b>Учёба / домашка</b><i>Репетитор: пошаговые объяснения</i></span>
+    <span class="switch" id="swStudy"></span>
+  </button>
+  <button class="sheet-item" id="plDev">
+    <span class="si-ico">👨‍💻</span>
+    <span class="si-txt"><b>Режим разработчика</b><i>Код-первых ответы + песочница превью</i></span>
+    <span class="switch" id="swDev"></span>
+  </button>
+  <div class="sheet-sep"></div>
+  <button class="sheet-item" id="plAttach">
+    <span class="si-ico">📎</span>
+    <span class="si-txt"><b>Прикрепить фото, видео, документ</b><i>Задачи по фото, PDF, код и текст</i></span>
+  </button>
+  <button class="sheet-item" id="plPhoto">
+    <span class="si-ico">🎨</span>
+    <span class="si-txt"><b>Генератор фото HD</b><i>Картинки и арты прямо в чат</i></span>
+  </button>
+  <button class="sheet-item" id="plSandbox">
+    <span class="si-ico">🧪</span>
+    <span class="si-txt"><b>Песочница HTML/JS</b><i>Редактор, предпросмотр, скачивание .html</i></span>
+  </button>
+</div>
+
+<div id="modelModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-title">Модель</div>
+    <div id="modelList"></div>
+    <button class="modal-close" id="btnModelClose">Закрыть</button>
+  </div>
+</div>
+
+<div id="settingsOverlay" class="hidden">
+  <div class="set-head">
+    <div class="set-title">⚙️ Настройки и Центр аккаунтов</div>
+    <button class="icon-btn" id="btnSettingsClose" aria-label="Закрыть настройки">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <div class="set-body">
+    <div class="set-section">
+      <div class="set-h">Puter Cloud — питание ИИ</div>
+      <div class="acc-row">
+        <span class="acc-dot none" id="accPuterDot" style="--c:#10A37F"></span>
+        <span class="acc-txt"><b>Puter Cloud</b><i id="accPuterStatus">Проверяю…</i></span>
+      </div>
+      <div class="set-btns">
+        <button class="set-btn" id="btnPuterGuest">⚡ Гостевой вход</button>
+        <button class="set-btn" id="btnPuterSignIn">Войти в аккаунт</button>
+        <button class="set-btn" id="btnPuterSignOut">Выйти</button>
+      </div>
+      <div class="set-note">Гостевой вход создаёт временный аккаунт автоматически — чат работает сразу, без окна авторизации. Полный аккаунт сохраняет квоты и историю Puter.</div>
+    </div>
+
+    <div class="set-section">
+      <div class="set-h">Центр аккаунтов · личные сервисы</div>
+      <div id="accList"></div>
+      <div class="set-note">Вход выполняется на официальном сайте внутри приложения (кнопка «← Kortex AI» вернёт обратно). Приложение не читает чужие cookies, поэтому статус «Подключён» подтверждается кнопкой «Готово» и хранится локально.</div>
+    </div>
+
+    <div class="set-section">
+      <div class="set-h">Голосовой ассистент</div>
+      <div class="set-row">
+        <span class="si-txt"><b>Слушать после ответа</b><i>Непрерывный диалог без кнопки</i></span>
+        <span class="switch" id="swAutoListen"></span>
+      </div>
+      <div class="set-row">
+        <span class="si-txt"><b>Озвучивать ответы</b><i>Русский голос TTS устройства</i></span>
+        <span class="switch" id="swTts"></span>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <div class="set-h">История и память</div>
+      <div class="storage-info" id="storageInfo">—</div>
+      <div class="set-btns">
+        <button class="set-btn" id="btnExportHistory">⬇ Экспорт истории (.json)</button>
+        <button class="set-btn" id="btnClearMedia">🧹 Очистить медиа-кэш</button>
+        <button class="set-btn danger" id="btnClearHistory">🗑 Очистить историю</button>
+      </div>
+    </div>
+
+    <div class="set-section">
+      <div class="set-h">Сброс</div>
+      <div class="set-btns">
+        <button class="set-btn" id="btnResetSettings">↺ Сбросить настройки</button>
+      </div>
+      <div class="set-note">Модель по умолчанию — ⚡ GPT-4o mini (ответ 1–2 секунды). Тяжёлые задачи — «⚡ Совместные модели».</div>
+    </div>
+    <div class="about" id="aboutVer">Kortex AI v1.0.0</div>
+  </div>
+</div>
+
+<div id="devModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="modal-title">🛠 Developer Turbo Menu</div>
+    <div class="seg">
+      <button class="seg-btn" id="spdNormal">Обычный</button>
+      <button class="seg-btn" id="spdTurbo">Турбо-стрим</button>
+      <button class="seg-btn" id="spdInstant">Мгновенный ответ</button>
+    </div>
+    <div class="dev-row">
+      <span class="si-txt"><b>Усиленные анимации 60 FPS</b><i>rAF-стрим, плавная сфера, быстрые переходы</i></span>
+      <span class="switch" id="swFps60"></span>
+    </div>
+    <div class="dev-row">
+      <span class="si-txt"><b>Turbo Fallback · авто-обход квот</b><i>Лимит модели → мгновенный переход и карантин 5 мин</i></span>
+      <span class="switch" id="swTurboFb"></span>
+    </div>
+    <div class="dev-actions">
+      <button class="set-btn" id="btnClearCooldown">Сбросить карантин</button>
+      <button class="set-btn" id="btnDevDiag">Обновить диагностику</button>
+    </div>
+    <div class="diag" id="devDiag">—</div>
+    <button class="modal-close" id="btnDevClose">Закрыть</button>
+  </div>
+</div>
+
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-card">
+    <div class="confirm-text" id="confirmText">Подтвердите действие</div>
+    <div class="confirm-btns">
+      <button class="btn-ghost" id="confirmNo">Отмена</button>
+      <button class="btn-primary" id="confirmYes">Да</button>
+    </div>
+  </div>
+</div>
+
+<div id="voiceOverlay" class="hidden" data-state="idle">
+  <button class="icon-btn voice-close" id="btnVoiceClose" aria-label="Закрыть ассистента">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+  <div id="sphereWrap">
+    <div class="sphere-ring r1"></div>
+    <div class="sphere-ring r2"></div>
+    <div id="sphere"></div>
+  </div>
+  <div id="voiceStatus">Готовлюсь…</div>
+  <div id="voiceTranscript"></div>
+  <div id="voiceHint">Говорите по-русски — текст появится здесь, ответ прозвучит голосом. Тап по сфере — пауза.</div>
+</div>
+
+<div id="sandboxOverlay" class="hidden">
+  <div class="sb-head">
+    <div class="sb-title">🧪 Песочница</div>
+    <div class="sb-tabs">
+      <button class="sb-tab active" id="sbTabCode">Код</button>
+      <button class="sb-tab" id="sbTabPreview">Превью</button>
+    </div>
+    <div class="sb-actions">
+      <button class="sb-btn" id="btnSbRun">▶ Запуск</button>
+      <button class="sb-btn" id="btnSbDownload">⬇ .html</button>
+      <button class="icon-btn" id="btnSbClose" aria-label="Закрыть песочницу">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+  <div id="sbBody" data-tab="code">
+    <textarea id="sbCode" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+    <iframe id="sbFrame" title="Предпросмотр" sandbox="allow-scripts allow-modals allow-forms allow-popups"></iframe>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*,video/*,.pdf,.txt,.py,.js,.html" multiple hidden>
+<div id="toasts"></div>
+<script>
+'use strict';
+(function(){
+/* ======================================================================
+   Kortex AI v1.0.0 — интерфейс
+   ====================================================================== */
+var VER='1.0.0';
+var LS_CHATS='kortex.chats.v1', LS_SET='kortex.settings.v2', LS_COOL='kortex.cooldown.v1', LS_PEND='kortex.pendingLink.v1';
+
+var MODELS=[
+  {id:'gpt-4o-mini',kind:'chat',name:'⚡ GPT-4o mini — мгновенно',badge:'4o mini',
+   desc:'Самая быстрая: ответ за 1–2 секунды на обычные вопросы',
+   aliases:['gpt-4o-mini','openai/gpt-4o-mini','gpt-4.1-mini','openai/gpt-4.1-mini']},
+  {id:'consilium',kind:'multi',name:'⚡ Совместные модели',badge:'Совместные',
+   desc:'Для сложного кода, больших проектов и глубокого анализа',aliases:[]},
+  {id:'deepseek-reasoner',kind:'chat',name:'DeepSeek R1',badge:'R1',
+   desc:'Лучшая для списывания на уроках, математики, физики и точных задач',
+   aliases:['deepseek-reasoner','deepseek/deepseek-reasoner','deepseek-r1','deepseek/deepseek-r1','deepseek-r1-0528','deepseek/deepseek-r1-0528']},
+  {id:'claude-sonnet-4',kind:'chat',name:'Claude Sonnet 4',badge:'Sonnet 4',
+   desc:'Лучшая для программирования, сайтов и сложных скриптов',
+   aliases:['claude-sonnet-4','anthropic/claude-sonnet-4','anthropic/claude-sonnet-4-20250514','claude-sonnet-4-0']},
+  {id:'gpt-4o',kind:'chat',name:'GPT-4o',badge:'GPT-4o',
+   desc:'Универсальный помощник для любых вопросов и текстов',
+   aliases:['gpt-4o','openai/gpt-4o']},
+  {id:'qwen-max',kind:'chat',name:'Qwen Max',badge:'Qwen Max',
+   desc:'Мощная генерация кода и работа с документами',
+   aliases:['qwen-max','qwen/qwen-max','qwen-max-latest','qwen/qwen-max-latest']},
+  {id:'deepseek-chat',kind:'chat',name:'DeepSeek Chat',badge:'DeepSeek',
+   desc:'Быстрая и точная: разговоры, код, переводы',
+   aliases:['deepseek-chat','deepseek/deepseek-chat']},
+  {id:'image-hd',kind:'image',name:'🎨 Генератор фото HD',badge:'Фото HD',
+   desc:'Создание картинок и артов в высоком качестве',aliases:[]}
+];
+var CONSILIUM=['claude-sonnet-4','gpt-4o','deepseek-chat','qwen-max'];
+var FAST_CHAIN=['gpt-4o-mini','deepseek-chat','gpt-4o','qwen-max','claude-sonnet-4'];
+var SYNTH=['gpt-4o-mini','gpt-4o','claude-sonnet-4'];
+var VISION={'gpt-4o':true,'gpt-4o-mini':true,'claude-sonnet-4':true};
+var META={}, AVAIL=null;
+MODELS.forEach(function(m){META[m.id]=m;});
+var PL_LABEL={search:'🔍 Поиск',study:'🎓 Учёба',dev:'👨‍💻 Dev'};
+var SERVICES=[
+  {id:'gemini',name:'Google Gemini',url:'https://gemini.google.com',color:'#4285F4'},
+  {id:'chatgpt',name:'ChatGPT',url:'https://chatgpt.com',color:'#10A37F'},
+  {id:'claude',name:'Claude',url:'https://claude.ai',color:'#D97757'},
+  {id:'deepseek',name:'DeepSeek',url:'https://chat.deepseek.com',color:'#4D6BFE'},
+  {id:'qwen',name:'Qwen Chat',url:'https://chat.qwen.ai',color:'#615CED'},
+  {id:'kimi',name:'Kimi',url:'https://kimi.moonshot.cn',color:'#8E8E93'}
+];
+var SB_DEFAULT=[
+ '<!DOCTYPE html>','<html lang="ru">','<head>','<meta charset="utf-8">',
+ '<meta name="viewport" content="width=device-width,initial-scale=1">','<style>',
+ '  body{margin:0;min-height:100vh;display:grid;place-items:center;background:#171717;color:#ECECEC;font-family:system-ui,sans-serif}',
+ '  .card{background:#212121;border:1px solid #2F2F2F;border-radius:16px;padding:28px;text-align:center}',
+ '  button{margin-top:14px;background:#ECECEC;color:#171717;border:0;border-radius:10px;padding:10px 18px;font-size:15px;cursor:pointer}',
+ '</style>','</head>','<body>','  <div class="card">','    <h2>🧪 Песочница Kortex</h2>',
+ '    <p id="n">Нажми кнопку</p>',
+ '    <button onclick="window.c=(window.c||0)+1;document.getElementById(&quot;n&quot;).textContent=&quot;Работает! &quot;+window.c">Клик</button>',
+ '  </div>','</body>','</html>'
+].join('\n');
+
+/* ---------------------------- состояние ---------------------------- */
+var settings={
+  model:'gpt-4o-mini',
+  plugins:{search:false,study:false,dev:false},
+  speed:'turbo',
+  dev:{unlocked:false,fps60:false,turboFallback:true},
+  voice:{autoListen:true,tts:true},
+  accounts:{}
+};
+var chats=[], currentId=null, generating=false, abortCtrl=null;
+var attachments=[], CODE_STORE={}, IMG_STORE={}, codeSeq=0;
+var voice={active:false,paused:false,state:'idle',rec:null};
+var COOL={}, saveTimer=null, puterWait=null, authPromise=null, guest=false;
+var egg={count:0,last:0};
+var rafId=null, rmsTarget=0, rmsCur=0, lastFrame=0;
+
+/* ---------------------------- утилиты ---------------------------- */
+function $(s){return document.querySelector(s);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function native(){return window.KortexNative||null;}
+function fmtSize(n){return n>1048576?(n/1048576).toFixed(1)+' МБ':n>1024?Math.round(n/1024)+' КБ':n+' Б';}
+function clamp(v,a,b){return v<a?a:v>b?b:v;}
+function buzz(ms){
+  try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}
+  var n=native();if(n&&n.vibrate){try{n.vibrate(ms);}catch(e){}}
+}
+function toast(t){
+  var box=$('#toasts'), d=document.createElement('div');
+  d.className='toast'; d.textContent=t; box.appendChild(d);
+  while(box.children.length>3)box.removeChild(box.firstChild);
+  setTimeout(function(){d.classList.add('out');setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},350);},2600);
+}
+function fetchJson(url,ms){
+  var c=new AbortController(), t=setTimeout(function(){c.abort();},ms||8000);
+  function clean(){clearTimeout(t);}
+  return fetch(url,{signal:c.signal}).then(function(r){clean();return r.json();},function(e){clean();throw e;});
+}
+function copyText(t,btn){
+  function ok(){if(btn){var old=btn.textContent;btn.textContent='✓ Скопировано';setTimeout(function(){btn.textContent=old;},1300);}}
+  function fb(){
+    var ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');ok();}catch(e){toast('Не удалось скопировать');}
+    document.body.removeChild(ta);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fb);else fb();
+}
+var confirmCb=null;
+function askConfirm(text,cb){
+  confirmCb=cb;$('#confirmText').textContent=text;$('#confirmModal').classList.remove('hidden');
+}
+
+/* ------------------------- IndexedDB (медиа) ------------------------- */
+var idb=null, MEM={};
+function openIDB(){
+  return new Promise(function(res){
+    if(idb)return res(idb);
+    try{
+      var rq=indexedDB.open('kortex-media',1);
+      rq.onupgradeneeded=function(){var db=rq.result;if(!db.objectStoreNames.contains('media'))db.createObjectStore('media');};
+      rq.onsuccess=function(){idb=rq.result;res(idb);};
+      rq.onerror=function(){res(null);};
+    }catch(e){res(null);}
+  });
+}
+function idbPut(k,v){
+  return openIDB().then(function(db){
+    if(!db){MEM[k]=v;return true;}
+    return new Promise(function(res){
+      try{
+        var tx=db.transaction('media','readwrite');
+        tx.objectStore('media').put(v,k);
+        tx.oncomplete=function(){res(true);};
+        tx.onerror=function(){MEM[k]=v;res(true);};
+      }catch(e){MEM[k]=v;res(true);}
+    });
+  });
+}
+function idbGet(k){
+  if(MEM[k])return Promise.resolve(MEM[k]);
+  return openIDB().then(function(db){
+    if(!db)return null;
+    return new Promise(function(res){
+      try{
+        var rq=db.transaction('media','readonly').objectStore('media').get(k);
+        rq.onsuccess=function(){res(rq.result||null);};
+        rq.onerror=function(){res(null);};
+      }catch(e){res(null);}
+    });
+  });
+}
+function idbClear(){
+  MEM={};IMG_STORE={};
+  return openIDB().then(function(db){
+    if(!db)return true;
+    return new Promise(function(res){
+      try{
+        var tx=db.transaction('media','readwrite');
+        tx.objectStore('media').clear();
+        tx.oncomplete=function(){res(true);};
+        tx.onerror=function(){res(false);};
+      }catch(e){res(false);}
+    });
+  });
+}
+
+/* ---------------------------- хранилище ---------------------------- */
+function newChatObj(){return {id:uid(),title:'Новый чат',createdAt:Date.now(),updatedAt:Date.now(),messages:[]};}
+function loadAll(){
+  try{
+    var s=JSON.parse(localStorage.getItem(LS_SET)||'null');
+    if(s){
+      if(s.model&&META[s.model])settings.model=s.model;
+      if(s.plugins)settings.plugins={search:!!s.plugins.search,study:!!s.plugins.study,dev:!!s.plugins.dev};
+      if(s.speed)settings.speed=s.speed;
+      if(s.dev)settings.dev={unlocked:!!s.dev.unlocked,fps60:!!s.dev.fps60,turboFallback:s.dev.turboFallback!==false};
+      if(s.voice)settings.voice={autoListen:s.voice.autoListen!==false,tts:s.voice.tts!==false};
+      if(s.accounts)settings.accounts=s.accounts;
+    }
+  }catch(e){}
+  try{var c=JSON.parse(localStorage.getItem(LS_CHATS)||'null');if(c&&c.length)chats=c;}catch(e){}
+  try{var k=JSON.parse(localStorage.getItem(LS_COOL)||'null');if(k)COOL=k;}catch(e){}
+  if(!chats.length)chats.push(newChatObj());
+  currentId=sortedChats()[0].id;
+}
+function sortedChats(){return chats.slice().sort(function(a,b){return b.updatedAt-a.updatedAt;});}
+function persistNow(){
+  try{localStorage.setItem(LS_CHATS,JSON.stringify(chats));return true;}
+  catch(e){
+    try{
+      var slim=chats.map(function(c){
+        return {id:c.id,title:c.title,createdAt:c.createdAt,updatedAt:c.updatedAt,
+          messages:c.messages.map(function(m){
+            var o={id:m.id,role:m.role,content:m.content,model:m.model,ts:m.ts};
+            if(m.atts)o.atts=m.atts;
+            if(m.role==='image'){o.prompt=m.prompt;o.key=m.key;}
+            return o;
+          })};
+      });
+      localStorage.setItem(LS_CHATS,JSON.stringify(slim));
+      toast('История сжата: превью картинок убраны из памяти');
+      return true;
+    }catch(e2){toast('Память переполнена — очистите историю в настройках');return false;}
+  }
+}
+function saveChats(){clearTimeout(saveTimer);saveTimer=setTimeout(persistNow,300);}
+function saveSettings(){try{localStorage.setItem(LS_SET,JSON.stringify(settings));}catch(e){}}
+function saveCool(){try{localStorage.setItem(LS_COOL,JSON.stringify(COOL));}catch(e){}}
+function getChat(){for(var i=0;i<chats.length;i++)if(chats[i].id===currentId)return chats[i];return null;}
+function markCool(id,ms){COOL[id]=Date.now()+(ms||300000);saveCool();}
+function isCooled(id){return COOL[id]&&COOL[id]>Date.now();}
+
+/* ------------------------ markdown + подсветка ------------------------ */
+function highlight(code,lang){
+  if(window.hljs){
+    try{
+      if(lang&&hljs.getLanguage(lang))return hljs.highlight(code,{language:lang,ignoreIllegals:true}).value;
+      return hljs.highlightAuto(code).value;
+    }catch(e){}
+  }
+  return esc(code);
+}
+function codeBlockHtml(code,lang,hl){
+  var id='cb'+(++codeSeq);CODE_STORE[id]=code;
+  var l=(lang||'').toLowerCase();
+  var isHtml=/^(html|htm|xml|svg)$/.test(l)||/<(!doctype|html|body|div|script|style)[\s>]/i.test(code);
+  return '<div class="code-block"><div class="code-head"><span>'+esc(l||'code')+'</span><span class="code-tools">'+
+    '<button class="code-btn" data-act="copy" data-code="'+id+'">Копировать</button>'+
+    (isHtml?'<button class="code-btn" data-act="preview" data-code="'+id+'">▶ Превью</button>':'')+
+    '</span></div><pre><code class="hljs">'+(hl?highlight(code,l):esc(code))+'</code></pre></div>';
+}
+function inlineMd(s){
+  var codes=[];
+  s=s.replace(/`([^`\n]+)`/g,function(_,c){codes.push(c);return '\u0000'+(codes.length-1)+'\u0000';});
+  s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');
+  s=s.replace(/(^|[\s(])\*([^*\n]+)\*/g,'$1<i>$2</i>');
+  s=s.replace(/(^|[\s(])_([^_\n]+)_/g,'$1<i>$2</i>');
+  s=s.replace(/~~([^~]+)~~/g,'<s>$1</s>');
+  s=s.replace(/\u0000(\d+)\u0000/g,function(_,i){return '<code>'+esc(codes[+i])+'</code>';});
+  return s;
+}
+function renderMarkdown(src,hl){
+  var lines=String(src).replace(/\r\n?/g,'\n').split('\n'),out='',i=0;
+  function isSep(l){return /^\s*\|?\s*:?-{3,}[\s:|-]*$/.test(l)&&l.indexOf('-')>=0;}
+  function cells(l){return l.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(function(c){return c.trim();});}
+  while(i<lines.length){
+    var line=lines[i];
+    var f=line.match(/^\s*```(\S*)\s*$/);
+    if(f){
+      var buf=[];i++;
+      while(i<lines.length&&!/^\s*```\s*$/.test(lines[i])){buf.push(lines[i]);i++;}
+      i++;out+=codeBlockHtml(buf.join('\n'),f[1],hl);continue;
+    }
+    if(/^\s*$/.test(line)){i++;continue;}
+    var h=line.match(/^(#{1,6})\s+(.*)$/);
+    if(h){var n=Math.min(h[1].length,4);out+='<h'+n+'>'+inlineMd(esc(h[2]))+'</h'+n+'>';i++;continue;}
+    if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)){out+='<hr>';i++;continue;}
+    if(/^\s*>\s?/.test(line)){
+      var q=[];while(i<lines.length&&/^\s*>\s?/.test(lines[i])){q.push(lines[i].replace(/^\s*>\s?/,''));i++;}
+      out+='<blockquote>'+q.map(function(l){return inlineMd(esc(l));}).join('<br>')+'</blockquote>';continue;
+    }
+    if(/^\s*[-*+]\s+/.test(line)){
+      var ul=[];while(i<lines.length&&/^\s*[-*+]\s+/.test(lines[i])){ul.push(lines[i].replace(/^\s*[-*+]\s+/,''));i++;}
+      out+='<ul>'+ul.map(function(l){return '<li>'+inlineMd(esc(l))+'</li>';}).join('')+'</ul>';continue;
+    }
+    if(/^\s*\d+[.)]\s+/.test(line)){
+      var ol=[];while(i<lines.length&&/^\s*\d+[.)]\s+/.test(lines[i])){ol.push(lines[i].replace(/^\s*\d+[.)]\s+/,''));i++;}
+      out+='<ol>'+ol.map(function(l){return '<li>'+inlineMd(esc(l))+'</li>';}).join('')+'</ol>';continue;
+    }
+    if(line.indexOf('|')>=0&&i+1<lines.length&&isSep(lines[i+1])){
+      var head=cells(line);i+=2;var rows=[];
+      while(i<lines.length&&lines[i].indexOf('|')>=0&&!/^\s*$/.test(lines[i])){rows.push(cells(lines[i]));i++;}
+      out+='<div class="md-table"><table><thead><tr>'+head.map(function(c){return '<th>'+inlineMd(esc(c))+'<
